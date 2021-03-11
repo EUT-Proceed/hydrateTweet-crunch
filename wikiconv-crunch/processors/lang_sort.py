@@ -73,7 +73,8 @@ def configure_subparsers(subparsers):
 def main(
         dump: Iterable[list],
         basename: str,
-        args: argparse.Namespace) -> None:
+        args: argparse.Namespace,
+        desr_dict: dict) -> None:
     """Main function that parses the arguments and writes the output."""
     stats = {
         'performance': {
@@ -119,16 +120,21 @@ def main(
 
     for obj in res:
         if not args.dry_run:
-            file_path = f"{args.output_dir_path}/sort-lang/{obj['lang']}/{path_list[3]}-{path_list[4]}"
-            Path(file_path).mkdir(parents=True, exist_ok=True)
-            #! json output path depends on obj in res
-            output_filename = f"{file_path}/{path_list[0]}-{path_list[1]}-{path_list[3]}-{path_list[4]}-{path_list[5]}.json"
-            
-            #TODO... change output_writer to open files in append mode
-            output = fu.output_writer(
-                path=output_filename,
-                compression=args.output_compression,
-            )
+            if not obj['lang'] in desr_dict['descriptors']:
+                # utils.log(f"opening a descriptor for {obj['lang']}")
+                file_path = f"{args.output_dir_path}/sort-lang/{obj['lang']}/{path_list[3]}-{path_list[4]}"
+                Path(file_path).mkdir(parents=True, exist_ok=True)
+
+                output_filename = f"{file_path}/{path_list[0]}-{path_list[1]}-{path_list[3]}-{path_list[4]}-{path_list[5]}.json"
+                
+                #Save the descriptor for that particular language
+                desr_dict['descriptors'][obj['lang']] = fu.output_writer(
+                    path=output_filename,
+                    compression=args.output_compression,
+                )
+
+            #retrieve the descriptor for that particular language
+            output = desr_dict['descriptors'][obj['lang']]
 
         output.write(json.dumps(obj))
         output.write("\n")

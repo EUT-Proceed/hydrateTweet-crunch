@@ -47,6 +47,13 @@ def get_args():
 
     return parsed_args
 
+def init_descriptor_dict(day=0, month=0):
+    return {"current_day": day, "current_month": month, "descriptors": {}}
+
+def close_all_descriptors(desr_dict:dict):
+    for descriptor in desr_dict['descriptors']:
+        desr_dict['descriptors'][descriptor].close()
+    utils.log('descriptors all closed')
 
 def main():
     """Main function."""
@@ -54,6 +61,8 @@ def main():
 
     if not args.output_dir_path.exists():
         args.output_dir_path.mkdir(parents=True)
+
+    desr_dict = init_descriptor_dict()
 
     for input_file_path in args.files:
         utils.log("Analyzing {}...".format(input_file_path))
@@ -64,10 +73,18 @@ def main():
         # https://stackoverflow.com/a/47496703/2377454
         basename = input_file_path.stem
 
+        name_list = basename.split('-')
+        #checking if the day or month has changed 
+        if desr_dict['current_day'] != name_list[5] or desr_dict['current_month'] != name_list[4]:
+            utils.log('change day/month: closing all descriptors...')
+            close_all_descriptors(desr_dict)
+            desr_dict = init_descriptor_dict(name_list[5],  name_list[4])
+
         args.func(
             dump,
             basename,
             args,
+            desr_dict
         )
 
         # explicitly close input files
@@ -75,6 +92,7 @@ def main():
 
         utils.log("Done Analyzing {}.".format(input_file_path))
 
+    close_all_descriptors(desr_dict)
 
 if __name__ == '__main__':
     main()
