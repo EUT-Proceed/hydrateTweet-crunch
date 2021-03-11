@@ -30,8 +30,8 @@ stats_template = '''
         <start_time>${stats['performance']['start_time'] | x}</start_time>
         <end_time>${stats['performance']['end_time'] | x}</end_time>
         <input>
-            <objects>${stats['performance']['input']['unique'] | x}</objects>
-            <retweet>${stats['performance']['input']['retweet'] | x}</retweet>
+            <uniques>${stats['performance']['input']['unique'] | x}</uniques>
+            <retweets>${stats['performance']['input']['retweet'] | x}</retweets>
         </input>
     </performance>
 </stats>
@@ -44,9 +44,9 @@ def process_lines(
     """Assign each revision to the snapshot or snapshots to which they
        belong.
     """
-    count = 1
+
     for raw_obj in dump:
-        if not raw_obj['retweeted']:
+        if not 'retweeted_status' in raw_obj:
             obj = types.cast_json(raw_obj)
 
             stats['performance']['input']['unique'] += 1
