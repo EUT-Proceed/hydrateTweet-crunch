@@ -38,7 +38,7 @@ def get_args():
     )
 
     subparsers = parser.add_subparsers(help='sub-commands help')
-    processors.pageid_filter.configure_subparsers(subparsers)
+    processors.lang_sort.configure_subparsers(subparsers)
 
     parsed_args = parser.parse_args()
     if 'func' not in parsed_args:

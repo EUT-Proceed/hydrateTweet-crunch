@@ -45,9 +45,9 @@ def output_writer(path: str, compression: Optional[str]):
     if compression == '7z':
         return compressor_7z(path + '.7z')
     elif compression == 'bz2':
-        return bz2.open(path + '.bz2', 'wt', encoding='utf-8')
+        return bz2.open(path + '.bz2', 'at', encoding='utf-8')
     elif compression == 'gzip':
-        return gzip.open(path + '.gz', 'wt', encoding='utf-8')
+        return gzip.open(path + '.gz', 'at', encoding='utf-8')
     else:
         return open(path, 'wt', encoding='utf-8')
 
