@@ -21,7 +21,7 @@ from operator import itemgetter
 from pprint import pprint
 
 # print a dot each NPRINTREVISION revisions
-NPRINTREVISION = 10000
+NTWEET = 10000
 
 # templates
 stats_template = '''
@@ -52,7 +52,7 @@ def process_lines(
             stats['performance']['input']['unique'] += 1
             
             nobjs = stats['performance']['input']['unique']
-            if (nobjs-1) % NPRINTREVISION == 0:
+            if (nobjs-1) % NTWEET == 0:
                 utils.dot()
 
             yield obj
@@ -70,11 +70,16 @@ def configure_subparsers(subparsers):
     parser.set_defaults(func=main)
 
 
+def close_all_descriptors(desr_dict:dict):
+    for lang in desr_dict:
+        desr_dict[lang].close()
+    utils.log('descriptors all closed')
+
+
 def main(
         dump: Iterable[list],
         basename: str,
-        args: argparse.Namespace,
-        desr_dict: dict) -> None:
+        args: argparse.Namespace) -> None:
     """Main function that parses the arguments and writes the output."""
     stats = {
         'performance': {
@@ -86,19 +91,19 @@ def main(
             },
         },
     }
+
+    desr_dict = {}
     stats['performance']['start_time'] = datetime.datetime.utcnow()
 
     output = open(os.devnull, 'wt')
     stats_output = open(os.devnull, 'wt')
 
     # process the dump
-    #! ask cristian if it's better to remove the function call
     res = process_lines(
         dump,
         stats=stats,
     )
 
-    #TODO... based on the information returned from res configure the output
     if not args.dry_run:
         stats_path = f"{args.output_dir_path}/sort-lang/stats"
         Path(stats_path).mkdir(parents=True, exist_ok=True)
@@ -108,7 +113,6 @@ def main(
                            )
                    )
         
-        #! stats output: it is constant over the same file
         stats_filename = f"{stats_path}/{varname}.stats.xml"
 
         stats_output = fu.output_writer(
@@ -120,24 +124,26 @@ def main(
 
     for obj in res:
         if not args.dry_run:
-            if not obj['lang'] in desr_dict['descriptors']:
-                # utils.log(f"opening a descriptor for {obj['lang']}")
+            if not obj['lang'] in desr_dict:
+
                 file_path = f"{args.output_dir_path}/sort-lang/{obj['lang']}/{path_list[3]}-{path_list[4]}"
                 Path(file_path).mkdir(parents=True, exist_ok=True)
 
                 output_filename = f"{file_path}/{path_list[0]}-{path_list[1]}-{path_list[3]}-{path_list[4]}-{path_list[5]}.json"
                 
-                #Save the descriptor for that particular language
-                desr_dict['descriptors'][obj['lang']] = fu.output_writer(
+                # Save the descriptor for that particular language
+                desr_dict[obj['lang']] = fu.output_writer(
                     path=output_filename,
                     compression=args.output_compression,
                 )
 
-            #retrieve the descriptor for that particular language
-            output = desr_dict['descriptors'][obj['lang']]
+            # Retrieve the descriptor for that particular language
+            output = desr_dict[obj['lang']]
 
         output.write(json.dumps(obj))
         output.write("\n")
+    
+    close_all_descriptors(desr_dict)
 
     stats['performance']['end_time'] = datetime.datetime.utcnow()
     with stats_output:
@@ -146,3 +152,5 @@ def main(
             stats_output,
             stats=stats,
         )
+    
+    stats_output.close()
