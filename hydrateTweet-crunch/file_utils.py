@@ -49,7 +49,7 @@ def output_writer(path: str, compression: Optional[str]):
     elif compression == 'gz':
         return gzip.open(path + '.gz', 'at', encoding='utf-8')
     else:
-        return open(path, 'wt', encoding='utf-8')
+        return open(path, 'at', encoding='utf-8')
 
 
 def create_path(path: Union[pathlib.Path, str]):
