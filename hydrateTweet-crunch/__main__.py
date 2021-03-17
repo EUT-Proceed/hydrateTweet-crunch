@@ -26,7 +26,7 @@ def get_args():
     )
     parser.add_argument(
         '--output-compression',
-        choices={None, '7z', 'bz2', 'gzip'},
+        choices={None, '7z', 'bz2', 'gz'},
         required=False,
         default=None,
         help='Output compression format [default: no compression].',
@@ -39,6 +39,7 @@ def get_args():
 
     subparsers = parser.add_subparsers(help='sub-commands help')
     processors.lang_sort.configure_subparsers(subparsers)
+    processors.analyse_emotions.configure_subparsers(subparsers)
 
     parsed_args = parser.parse_args()
     if 'func' not in parsed_args:
@@ -62,7 +63,6 @@ def main():
         # get filename without the extension
         # https://stackoverflow.com/a/47496703/2377454
         basename = input_file_path.stem
-
         args.func(
             dump,
             basename,

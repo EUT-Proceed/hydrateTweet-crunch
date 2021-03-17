@@ -1,1 +1,4 @@
-from . import lang_sort
+from . import (
+    lang_sort,
+    analyse_emotions,
+)

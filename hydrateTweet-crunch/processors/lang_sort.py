@@ -14,13 +14,13 @@ from typing import Iterable, Iterator, Mapping
 
 from .. import file_utils as fu
 from .. import dumper
-from .. import types
+from .. import custom_types
 from .. import utils
 
 from operator import itemgetter
 from pprint import pprint
 
-# print a dot each NPRINTREVISION revisions
+# print a dot each NTWEET tweets
 NTWEET = 10000
 
 # templates
@@ -47,7 +47,7 @@ def process_lines(
 
     for raw_obj in dump:
         if not 'retweeted_status' in raw_obj:
-            obj = types.cast_json(raw_obj)
+            obj = custom_types.cast_json(raw_obj)
 
             stats['performance']['input']['unique'] += 1
             
