@@ -101,7 +101,7 @@ def process_tweet(
     for emotion in countEmotionsOfText(full_text):
         emotion_name = getEmotionName(emotion)
         if emotion_name in emotions and emotions[emotion_name] == 0:
-            stats_dict[emotion_name] += 1
+            stats_dict[f'{emotion_name}_count'] += 1
             emotions[emotion_name] = 1
     
     stats['performance']['input']['tweets'] += 1
@@ -148,7 +148,7 @@ def calculate_emotions_percentage(
         emotion_name = getEmotionName(emotion)
         if emotion_name in stats_dict:
             if stats_dict['total'] > 0:
-                stats_dict[f'{emotion_name}_percentage'] = stats_dict[emotion_name]/stats_dict['total']
+                stats_dict[emotion_name] = stats_dict[f'{emotion_name}_count']/stats_dict['total']
 
 def main(
         dump: Iterable[list],
@@ -168,17 +168,6 @@ def main(
     users_dict:dict = {}
     fieldnames = [
         "date",
-        "positive_percentage", 
-        "negative_percentage", 
-        "anger_percentage", 
-        "anticipation_percentage", 
-        "disgust_percentage", 
-        "fear_percentage", 
-        "joy_percentage", 
-        "sadness_percentage", 
-        "surprise_percentage", 
-        "trust_percentage", 
-        "total", 
         "positive", 
         "negative", 
         "anger", 
@@ -188,7 +177,18 @@ def main(
         "joy", 
         "sadness", 
         "surprise", 
-        "trust"
+        "trust", 
+        "total", 
+        "positive_count", 
+        "negative_count", 
+        "anger_count", 
+        "anticipation_count", 
+        "disgust_count", 
+        "fear_count", 
+        "joy_count", 
+        "sadness_count", 
+        "surprise_count", 
+        "trust_count"
     ]
 
     stats_dict:dict = {}
@@ -221,7 +221,7 @@ def main(
     stats_dict['date'] = f"{path_list[3]}/{path_list[4]}/{path_list[2]}"
 
     if not args.dry_run:
-        stats_path = f"{args.output_dir_path}/analyse-emotions/stats"
+        stats_path = f"{args.output_dir_path}/analyse-emotions/stats/{lang}"
         Path(stats_path).mkdir(parents=True, exist_ok=True)
         varname = ('{basename}.{func}'
                    .format(basename=basename,
