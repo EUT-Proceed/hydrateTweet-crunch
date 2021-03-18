@@ -153,7 +153,8 @@ def calculate_emotions_percentage(
 def main(
         dump: Iterable[list],
         basename: str,
-        args: argparse.Namespace) -> None:
+        args: argparse.Namespace,
+        shared) -> None:
     """Main function that parses the arguments and writes the output."""
     stats = {
         'performance': {
@@ -236,6 +237,7 @@ def main(
         stats_output = fu.output_writer(
             path=stats_filename,
             compression=args.output_compression,
+            mode='wt'
         )
 
         if not lang is None:

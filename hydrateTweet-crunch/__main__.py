@@ -8,7 +8,7 @@ from . import processors, utils, file_utils
 def get_args():
     """Parse command line arguments."""
     parser = argparse.ArgumentParser(
-        prog='wikiconv-crunch',
+        prog='hydrateTweet-crunch',
         description='Graph snapshot features extractor.',
     )
     parser.add_argument(
@@ -16,7 +16,7 @@ def get_args():
         metavar='FILE',
         type=pathlib.Path,
         nargs='+',
-        help='Wikidump file to parse, can be compressed.',
+        help='Twitter file to parse, can be compressed.',
     )
     parser.add_argument(
         'output_dir_path',
@@ -55,6 +55,8 @@ def main():
     if not args.output_dir_path.exists():
         args.output_dir_path.mkdir(parents=True)
 
+    shared = None
+
     for input_file_path in args.files:
         utils.log("Analyzing {}...".format(input_file_path))
 
@@ -64,9 +66,10 @@ def main():
         # https://stackoverflow.com/a/47496703/2377454
         basename = input_file_path.stem
         args.func(
-            dump,
-            basename,
-            args
+            dump=dump,
+            basename=basename,
+            args=args,
+            shared=shared
         )
 
         # explicitly close input files

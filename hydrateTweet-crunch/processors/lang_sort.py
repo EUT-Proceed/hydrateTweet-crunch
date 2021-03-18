@@ -79,7 +79,8 @@ def close_all_descriptors(desr_dict:dict):
 def main(
         dump: Iterable[list],
         basename: str,
-        args: argparse.Namespace) -> None:
+        args: argparse.Namespace,
+        shared) -> None:
     """Main function that parses the arguments and writes the output."""
     stats = {
         'performance': {
@@ -118,6 +119,7 @@ def main(
         stats_output = fu.output_writer(
             path=stats_filename,
             compression=args.output_compression,
+            mode='wt'
         )
 
     path_list = basename.split('-')
