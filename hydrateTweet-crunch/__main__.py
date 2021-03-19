@@ -40,6 +40,7 @@ def get_args():
     subparsers = parser.add_subparsers(help='sub-commands help')
     processors.lang_sort.configure_subparsers(subparsers)
     processors.analyse_emotions.configure_subparsers(subparsers)
+    processors.analyse_users.configure_subparsers(subparsers)
 
     parsed_args = parser.parse_args()
     if 'func' not in parsed_args:
@@ -55,7 +56,7 @@ def main():
     if not args.output_dir_path.exists():
         args.output_dir_path.mkdir(parents=True)
 
-    shared = None
+    shared = {}
 
     for input_file_path in args.files:
         utils.log("Analyzing {}...".format(input_file_path))
@@ -76,6 +77,16 @@ def main():
         dump.close()
 
         utils.log("Done Analyzing {}.".format(input_file_path))
+    
+    if 'finalize' in args:
+        utils.log("Executing finalize function...")
+
+        args.finalize(
+            args=args,
+            shared=shared
+        )
+
+        utils.log("Done executing finalize function.")
 
 if __name__ == '__main__':
     main()
