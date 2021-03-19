@@ -249,9 +249,13 @@ def main(
             else:
                 output_filename = f"{file_path}/{lang}-{path_list[0]}-{path_list[1]}.csv"
 
-            if not Path(output_filename).exists() and not Path(f"{output_filename}.{args.output_compression}").exists():
-                #The header of the .csv will be added only if the file doesn't exist
-                addHeader = True
+            #The header of the .csv will be added only if the file doesn't exist
+            if not args.output_compression:
+                if not Path(output_filename).exists():
+                    addHeader = True
+            else:
+                if not Path(f"{output_filename}.{args.output_compression}").exists():
+                    addHeader = True
 
             output = fu.output_writer(
                 path=output_filename,
