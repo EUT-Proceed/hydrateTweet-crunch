@@ -32,6 +32,7 @@ stats_template = '''
         <input>
             <uniques>${stats['performance']['input']['unique'] | x}</uniques>
             <retweets>${stats['performance']['input']['retweet'] | x}</retweets>
+            <total>${stats['performance']['input']['total'] | x}</total>
         </input>
     </performance>
 </stats>
@@ -46,14 +47,15 @@ def process_lines(
     """
 
     for raw_obj in dump:
+        stats['performance']['input']['total'] += 1
+        nobjs = stats['performance']['input']['total']
+        if (nobjs-1) % NTWEET == 0:
+            utils.dot()
+
         if not 'retweeted_status' in raw_obj:
             obj = custom_types.cast_json(raw_obj)
 
             stats['performance']['input']['unique'] += 1
-            
-            nobjs = stats['performance']['input']['unique']
-            if (nobjs-1) % NTWEET == 0:
-                utils.dot()
 
             yield obj
         else:
@@ -88,7 +90,8 @@ def main(
             'end_time': None,
             'input': {
                 'unique': 0,
-                'retweet': 0
+                'retweet': 0,
+                'total': 0
             },
         },
     }

@@ -84,7 +84,7 @@ def process_tweet(
 
     full_text = tweet['full_text']
     user_id = str(tweet['user']['id'])
-    if  not user_id in users_dict:
+    if not user_id in users_dict:
         if not args.per_tweet:
             users_dict[user_id] = new_emotions_dict()
             stats_dict['total'] += 1

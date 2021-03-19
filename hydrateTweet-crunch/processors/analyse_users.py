@@ -231,6 +231,7 @@ def write_users(
             output = fu.output_writer(
                 path=output_filename,
                 compression=args.output_compression,
+                mode='wt'
             )
         
         writer = csv.DictWriter(output, fieldnames=fieldnames)
