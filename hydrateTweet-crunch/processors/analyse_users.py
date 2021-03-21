@@ -121,7 +121,7 @@ def configure_subparsers(subparsers):
         help='Analyse users from tweets and generate a file which contains info about every user and their number of tweets.',
     )
 
-    parser.set_defaults(func=main, finalize=write_users)
+    parser.set_defaults(func=main, finalize=write_users, which='analyse_users')
 
 
 def main(

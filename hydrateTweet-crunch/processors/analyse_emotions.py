@@ -144,7 +144,7 @@ def configure_subparsers(subparsers):
         help='Standardize the results obtained using mean and standard deviation'
     )
 
-    parser.set_defaults(func=main)
+    parser.set_defaults(func=main, which='analyse_emotions')
 
 def calculate_emotions(
         stats_dict:dict,
@@ -287,7 +287,7 @@ def main(
     if addHeader:
         writer.writeheader()
     writer.writerow(stats_dict)
-    output.close
+    output.close()
 
     stats['performance']['end_time'] = datetime.datetime.utcnow()
     

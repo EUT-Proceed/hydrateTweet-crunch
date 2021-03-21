@@ -69,7 +69,7 @@ def configure_subparsers(subparsers):
         help='Sorts tweets by language and day, also removes useless fields.',
     )
 
-    parser.set_defaults(func=main)
+    parser.set_defaults(func=main, which='lang_sort')
 
 
 def close_all_descriptors(desr_dict:dict):
