@@ -47,6 +47,9 @@ def get_args():
         parser.print_usage()
         parser.exit(1)
 
+    if parsed_args.standardize:
+        parsed_args.finalize=processors.analyse_emotions.standardize
+
     return parsed_args
 
 def main():
@@ -87,6 +90,6 @@ def main():
         )
 
         utils.log("Done executing finalize function.")
-
+    
 if __name__ == '__main__':
     main()
