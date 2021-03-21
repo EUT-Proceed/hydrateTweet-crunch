@@ -336,9 +336,6 @@ def standardize(
         # Calculate standard deviation for every emotions
         calculate_stdvs(stats_dict, input_file_path)
 
-        
-        utils.log(stats_dict)
-
         utils.log(f"Writing standardized values for {input_file_path}...")
 
         output = open(os.devnull, 'wt')
