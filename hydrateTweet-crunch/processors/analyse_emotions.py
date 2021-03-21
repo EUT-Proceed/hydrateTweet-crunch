@@ -336,6 +336,9 @@ def standardize(
         # Calculate standard deviation for every emotions
         calculate_stdvs(stats_dict, input_file_path)
 
+        
+        utils.log(stats_dict)
+
         utils.log(f"Writing standardized values for {input_file_path}...")
 
         output = open(os.devnull, 'wt')
@@ -347,6 +350,7 @@ def standardize(
             output = fu.output_writer(
                 path=output_filename,
                 compression=args.output_compression,
+                mode='wt'
             )
 
         writer = csv.DictWriter(output, fieldnames=fieldnames)
