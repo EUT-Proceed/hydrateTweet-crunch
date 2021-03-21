@@ -9,6 +9,7 @@ import csv
 import re
 import argparse
 import datetime
+import math
 from pathlib import Path
 
 from typing import Iterable, Iterator, Mapping, Counter
@@ -135,20 +136,24 @@ def configure_subparsers(subparsers):
     parser.add_argument(
         '--per-tweet', '-t',
         action='store_true',
-        help="Consider each tweet indipendently",
+        help='Consider each tweet indipendently',
+    )
+    parser.add_argument(
+        '--standardize', '-s',
+        action='store_true',
+        help='Standardize the results obtained using mean and standard deviation'
     )
 
     parser.set_defaults(func=main)
 
-def calculate_emotions_percentage(
+def calculate_emotions(
         stats_dict:dict,
         args:argparse.Namespace
     ):
     for emotion in Emotions:
         emotion_name = getEmotionName(emotion)
-        if emotion_name in stats_dict:
-            if stats_dict['total'] > 0:
-                stats_dict[emotion_name] = stats_dict[f'{emotion_name}_count']/stats_dict['total']
+        if emotion_name in stats_dict and stats_dict['total'] > 0:
+            stats_dict[emotion_name] = stats_dict[f'{emotion_name}_count']/stats_dict['total']
 
 def main(
         dump: Iterable[list],
@@ -212,8 +217,9 @@ def main(
         args=args
     )
 
-    # calculate the percentages
-    calculate_emotions_percentage(
+
+    # calculate emotions
+    calculate_emotions(
         stats_dict=stats_dict,
         args=args
     )
@@ -262,6 +268,21 @@ def main(
                 compression=args.output_compression,
             )
 
+            if args.standardize:
+                if not output_filename in shared:
+                    if args.output_compression:
+                        output_filename = '.'.join([output_filename, args.output_compression])
+                    shared[output_filename] = new_emotions_dict()
+                    # initialize the number of total days for the mean
+                    shared[output_filename]["days"] = 0
+
+    if args.standardize:
+        for emotion in Emotions:
+            emotion_name = getEmotionName(emotion)
+            if emotion_name in stats_dict and emotion_name in shared[output_filename]:
+                shared[output_filename][emotion_name] += stats_dict[emotion_name]
+        shared[output_filename]["days"] += 1
+
     writer = csv.DictWriter(output, fieldnames=fieldnames)
     if addHeader:
         writer.writeheader()
@@ -278,3 +299,96 @@ def main(
         )
     
     stats_output.close()
+
+def standardize(
+        args: argparse.Namespace,
+        shared) -> None:
+    
+    fieldnames = [
+        "date",
+        "positive", 
+        "negative", 
+        "anger", 
+        "anticipation", 
+        "disgust", 
+        "fear", 
+        "joy", 
+        "sadness", 
+        "surprise", 
+        "trust"
+    ]
+
+    # For each file analyzed before
+    for input_file_path in shared:
+        utils.log(f"Calculating mean and standard deviation for {input_file_path}...")
+        basename = Path(input_file_path).stem
+        if not args.output_compression is None:
+            # Remove the .csv.gz
+            basename = Path(basename).stem
+
+        stats_dict = shared[input_file_path]
+        # Calculate mean for every emotions
+        for emotion in Emotions:
+            emotion_name = getEmotionName(emotion)
+            if emotion_name in stats_dict:
+                stats_dict[f"{emotion_name}_mean"] = stats_dict[emotion_name] / stats_dict["days"]
+                stats_dict[f"{emotion_name}_stdv"] = 0
+        # Calculate standard deviation for every emotions
+        calculate_stdvs(stats_dict, input_file_path)
+
+        utils.log(f"Writing standardized values for {input_file_path}...")
+
+        output = open(os.devnull, 'wt')
+        if not args.dry_run:
+            file_path = f"{args.output_dir_path}/analyse-emotions"
+            Path(file_path).mkdir(parents=True, exist_ok=True)
+            output_filename = f"{file_path}/{basename}-standardized.csv"
+
+            output = fu.output_writer(
+                path=output_filename,
+                compression=args.output_compression,
+            )
+
+        writer = csv.DictWriter(output, fieldnames=fieldnames)
+        # Write the .csv header
+        writer.writeheader()
+
+        csv_file = fu.open_csv_file(input_file_path)
+        csv_reader = csv.DictReader(csv_file)
+        for line in csv_reader:
+            csv_row = new_emotions_dict()
+            csv_row["date"] = line["date"]
+            for emotion in Emotions:
+                emotion_name = getEmotionName(emotion)
+                if emotion_name in stats_dict:
+                    emotion_value = float(line[emotion_name])
+                    mean = stats_dict[f"{emotion_name}_mean"]
+                    stdv = stats_dict[f"{emotion_name}_stdv"]
+                    try:
+                        csv_row[emotion_name] = (emotion_value - mean) / stdv
+                    except:
+                        csv_row[emotion_name] = 0
+            writer.writerow(csv_row)
+
+        output.close()
+        csv_file.close()
+
+def calculate_stdvs(
+        stats_dict:dict,
+        file_path:str):
+    csv_file = fu.open_csv_file(file_path)
+    csv_reader = csv.DictReader(csv_file)
+    for line in csv_reader:
+        for emotion in Emotions:
+            emotion_name = getEmotionName(emotion)
+            if emotion_name in stats_dict:
+                mean = stats_dict[f"{emotion_name}_mean"]
+                emotion_value = float(line[emotion_name])
+                stats_dict[f"{emotion_name}_stdv"] += pow(emotion_value - mean, 2)
+
+    for emotion in Emotions:
+        emotion_name = getEmotionName(emotion)
+        if emotion_name in stats_dict:
+            stats_dict[f"{emotion_name}_stdv"] = math.sqrt(stats_dict[f"{emotion_name}_stdv"] / stats_dict["days"])
+
+    csv_file.close()

@@ -221,7 +221,7 @@ def write_users(
     for lang in shared:
         stats['performance']['input']['languages'] += 1
         output = open(os.devnull, 'wt')
-
+        utils.log(f"Writing users for {lang}...")
         if not args.dry_run:
             file_path = f"{args.output_dir_path}/analyse-users"
             Path(file_path).mkdir(parents=True, exist_ok=True)
