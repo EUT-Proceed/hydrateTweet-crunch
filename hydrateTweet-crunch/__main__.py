@@ -47,7 +47,7 @@ def get_args():
         parser.print_usage()
         parser.exit(1)
 
-    if parsed_args.standardize:
+    if 'which' in parsed_args and parsed_args.which == 'analyse_emotions' and parsed_args.standardize:
         parsed_args.finalize=processors.analyse_emotions.standardize
 
     return parsed_args
