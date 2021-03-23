@@ -48,29 +48,29 @@ stats_template_finalize = '''
         <input>
             <lines>${stats['performance']['input']['lines'] | x}</lines>
         </input>
-        <results>
-            <positive_mean>${stats['results']['positive_mean'] | x}<positive_mean>
-            <negative_mean>${stats['results']['negative_mean'] | x}<negative_mean>
-            <anger_mean>${stats['results']['anger_mean'] | x}<anger_mean>
-            <anticipation_mean>${stats['results']['anticipation_mean'] | x}<anticipation_mean>
-            <disgust_mean>${stats['results']['disgust_mean'] | x}<disgust_mean>
-            <fear_mean>${stats['results']['fear_mean'] | x}<fear_mean>
-            <joy_mean>${stats['results']['joy_mean'] | x}<joy_mean>
-            <sadness_mean>${stats['results']['sadness_mean'] | x}<sadness_mean>
-            <surprise_mean>${stats['results']['surprise_mean'] | x}<surprise_mean>
-            <trust_mean>${stats['results']['trust_mean'] | x}<trust_mean>
-            <positive_stdv>${stats['results']['positive_stdv'] | x}<positive_stdv>
-            <negative_stdv>${stats['results']['negative_stdv'] | x}<negative_stdv>
-            <anger_stdv>${stats['results']['anger_stdv'] | x}<anger_stdv>
-            <anticipation_stdv>${stats['results']['anticipation_stdv'] | x}<anticipation_stdv>
-            <disgust_stdv>${stats['results']['disgust_stdv'] | x}<disgust_stdv>
-            <fear_stdv>${stats['results']['fear_stdv'] | x}<fear_stdv>
-            <joy_stdv>${stats['results']['joy_stdv'] | x}<joy_stdv>
-            <sadness_stdv>${stats['results']['sadness_stdv'] | x}<sadness_stdv>
-            <surprise_stdv>${stats['results']['surprise_stdv'] | x}<surprise_stdv>
-            <trust_stdv>${stats['results']['trust_stdv'] | x}<trust_stdv>
-        <results>
     </performance>
+    <results>
+        <positive_mean>${stats['results']['positive_mean'] | x}<positive_mean>
+        <negative_mean>${stats['results']['negative_mean'] | x}<negative_mean>
+        <anger_mean>${stats['results']['anger_mean'] | x}<anger_mean>
+        <anticipation_mean>${stats['results']['anticipation_mean'] | x}<anticipation_mean>
+        <disgust_mean>${stats['results']['disgust_mean'] | x}<disgust_mean>
+        <fear_mean>${stats['results']['fear_mean'] | x}<fear_mean>
+        <joy_mean>${stats['results']['joy_mean'] | x}<joy_mean>
+        <sadness_mean>${stats['results']['sadness_mean'] | x}<sadness_mean>
+        <surprise_mean>${stats['results']['surprise_mean'] | x}<surprise_mean>
+        <trust_mean>${stats['results']['trust_mean'] | x}<trust_mean>
+        <positive_stdv>${stats['results']['positive_stdv'] | x}<positive_stdv>
+        <negative_stdv>${stats['results']['negative_stdv'] | x}<negative_stdv>
+        <anger_stdv>${stats['results']['anger_stdv'] | x}<anger_stdv>
+        <anticipation_stdv>${stats['results']['anticipation_stdv'] | x}<anticipation_stdv>
+        <disgust_stdv>${stats['results']['disgust_stdv'] | x}<disgust_stdv>
+        <fear_stdv>${stats['results']['fear_stdv'] | x}<fear_stdv>
+        <joy_stdv>${stats['results']['joy_stdv'] | x}<joy_stdv>
+        <sadness_stdv>${stats['results']['sadness_stdv'] | x}<sadness_stdv>
+        <surprise_stdv>${stats['results']['surprise_stdv'] | x}<surprise_stdv>
+        <trust_stdv>${stats['results']['trust_stdv'] | x}<trust_stdv>
+    <results>
 </stats>
 '''
 

@@ -17,7 +17,6 @@ from .. import file_utils as fu
 from .. import dumper
 from .. import custom_types
 from .. import utils
-from ..emotion_lexicon import initEmotionLexicon, countEmotionsOfText, Emotions, getEmotionName
 
 from operator import itemgetter
 from pprint import pprint
