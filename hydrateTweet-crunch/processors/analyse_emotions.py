@@ -40,6 +40,40 @@ stats_template = '''
 </stats>
 '''
 
+stats_template_finalize = '''
+<stats>
+    <performance>
+        <start_time>${stats['performance']['start_time'] | x}</start_time>
+        <end_time>${stats['performance']['end_time'] | x}</end_time>
+        <input>
+            <lines>${stats['performance']['input']['lines'] | x}</lines>
+        </input>
+        <results>
+            <positive_mean>${stats['results']['positive_mean'] | x}<positive_mean>
+            <negative_mean>${stats['results']['negative_mean'] | x}<negative_mean>
+            <anger_mean>${stats['results']['anger_mean'] | x}<anger_mean>
+            <anticipation_mean>${stats['results']['anticipation_mean'] | x}<anticipation_mean>
+            <disgust_mean>${stats['results']['disgust_mean'] | x}<disgust_mean>
+            <fear_mean>${stats['results']['fear_mean'] | x}<fear_mean>
+            <joy_mean>${stats['results']['joy_mean'] | x}<joy_mean>
+            <sadness_mean>${stats['results']['sadness_mean'] | x}<sadness_mean>
+            <surprise_mean>${stats['results']['surprise_mean'] | x}<surprise_mean>
+            <trust_mean>${stats['results']['trust_mean'] | x}<trust_mean>
+            <positive_stdv>${stats['results']['positive_stdv'] | x}<positive_stdv>
+            <negative_stdv>${stats['results']['negative_stdv'] | x}<negative_stdv>
+            <anger_stdv>${stats['results']['anger_stdv'] | x}<anger_stdv>
+            <anticipation_stdv>${stats['results']['anticipation_stdv'] | x}<anticipation_stdv>
+            <disgust_stdv>${stats['results']['disgust_stdv'] | x}<disgust_stdv>
+            <fear_stdv>${stats['results']['fear_stdv'] | x}<fear_stdv>
+            <joy_stdv>${stats['results']['joy_stdv'] | x}<joy_stdv>
+            <sadness_stdv>${stats['results']['sadness_stdv'] | x}<sadness_stdv>
+            <surprise_stdv>${stats['results']['surprise_stdv'] | x}<surprise_stdv>
+            <trust_stdv>${stats['results']['trust_stdv'] | x}<trust_stdv>
+        <results>
+    </performance>
+</stats>
+'''
+
 
 def process_lines(
         dump: Iterable[list],
@@ -273,15 +307,6 @@ def main(
                     if args.output_compression:
                         output_filename = '.'.join([output_filename, args.output_compression])
                     shared[output_filename] = new_emotions_dict()
-                    # initialize the number of total days for the mean
-                    shared[output_filename]["days"] = 0
-
-    if args.standardize:
-        for emotion in Emotions:
-            emotion_name = getEmotionName(emotion)
-            if emotion_name in stats_dict and emotion_name in shared[output_filename]:
-                shared[output_filename][emotion_name] += stats_dict[emotion_name]
-        shared[output_filename]["days"] += 1
 
     writer = csv.DictWriter(output, fieldnames=fieldnames)
     if addHeader:
@@ -320,6 +345,41 @@ def standardize(
 
     # For each file analyzed before
     for input_file_path in shared:
+
+        stats = {
+            'performance': {
+                'start_time': None,
+                'end_time': None,
+                'input': {
+                    'lines': 0
+                },
+            },
+            'results':{
+                'positive_mean': 0,
+                'negative_mean': 0, 
+                'anger_mean': 0, 
+                'anticipation_mean': 0, 
+                'disgust_mean': 0, 
+                'fear_mean': 0, 
+                'joy_mean': 0, 
+                'sadness_mean': 0, 
+                'surprise_mean': 0, 
+                'trust_mean': 0,
+                'positive_stdv': 0,
+                'negative_stdv': 0, 
+                'anger_stdv': 0, 
+                'anticipation_stdv': 0, 
+                'disgust_stdv': 0, 
+                'fear_stdv': 0, 
+                'joy_stdv': 0, 
+                'sadness_stdv': 0, 
+                'surprise_stdv': 0, 
+                'trust_stdv': 0
+            }
+        }
+
+        stats['performance']['start_time'] = datetime.datetime.utcnow()
+
         utils.log(f"Calculating mean and standard deviation for {input_file_path}...")
         basename = Path(input_file_path).stem
         if not args.output_compression is None:
@@ -327,20 +387,42 @@ def standardize(
             basename = Path(basename).stem
 
         stats_dict = shared[input_file_path]
-        # Calculate mean for every emotions
+
+        #init days, mean and stdv
+        stats_dict["days"] = 0
         for emotion in Emotions:
             emotion_name = getEmotionName(emotion)
             if emotion_name in stats_dict:
-                stats_dict[f"{emotion_name}_mean"] = stats_dict[emotion_name] / stats_dict["days"]
+                stats_dict[f"{emotion_name}_mean"] = 0
                 stats_dict[f"{emotion_name}_stdv"] = 0
+
+        # Calculate mean for every emotions
+        calculate_means(stats_dict, input_file_path, stats)
+
         # Calculate standard deviation for every emotions
-        calculate_stdvs(stats_dict, input_file_path)
+        calculate_stdvs(stats_dict, input_file_path, stats)
 
         utils.log(f"Writing standardized values for {input_file_path}...")
 
         output = open(os.devnull, 'wt')
+        stats_output = open(os.devnull, 'wt')
         if not args.dry_run:
-            file_path = f"{args.output_dir_path}/analyse-emotions"
+            stats_path = f"{args.output_dir_path}/standardize/stats"
+            Path(stats_path).mkdir(parents=True, exist_ok=True)
+            varname = ('{basename}.{func}'
+                    .format(basename=basename,
+                            func='standardize'
+                            )
+                    )
+            stats_filename = f"{stats_path}/{varname}.stats.xml"
+
+            stats_output = fu.output_writer(
+                path=stats_filename,
+                compression=args.output_compression,
+                mode='wt'
+            )
+
+            file_path = f"{args.output_dir_path}/standardize"
             Path(file_path).mkdir(parents=True, exist_ok=True)
             output_filename = f"{file_path}/{basename}-standardized.csv"
 
@@ -357,6 +439,7 @@ def standardize(
         csv_file = fu.open_csv_file(input_file_path)
         csv_reader = csv.DictReader(csv_file)
         for line in csv_reader:
+            stats['performance']['input']['lines'] = datetime.datetime.utcnow()
             csv_row = new_emotions_dict()
             csv_row["date"] = line["date"]
             for emotion in Emotions:
@@ -374,9 +457,41 @@ def standardize(
         output.close()
         csv_file.close()
 
+        stats['performance']['end_time'] = datetime.datetime.utcnow()
+        with stats_output:
+            dumper.render_template(
+                stats_template_finalize,
+                stats_output,
+                stats=stats,
+            )
+    
+        stats_output.close()
+
+def calculate_means(
+    stats_dict:dict,
+    file_path:str,
+    stats:dict) -> None:
+    csv_file = fu.open_csv_file(file_path)
+    csv_reader = csv.DictReader(csv_file)
+    for line in csv_reader:
+        stats_dict["days"] += 1
+        for emotion in Emotions:
+            emotion_name = getEmotionName(emotion)
+            if emotion_name in stats_dict:
+                stats_dict[f"{emotion_name}_mean"] += float(line[emotion_name])
+    
+    for emotion in Emotions:
+            emotion_name = getEmotionName(emotion)
+            if emotion_name in stats_dict:
+                stats_dict[f"{emotion_name}_mean"] /= stats_dict["days"]
+                stats['results'][f"{emotion_name}_mean"] = stats_dict[f"{emotion_name}_mean"]
+    
+    csv_file.close()
+
 def calculate_stdvs(
         stats_dict:dict,
-        file_path:str):
+        file_path:str,
+        stats:dict) -> None:
     csv_file = fu.open_csv_file(file_path)
     csv_reader = csv.DictReader(csv_file)
     for line in csv_reader:
@@ -390,6 +505,6 @@ def calculate_stdvs(
     for emotion in Emotions:
         emotion_name = getEmotionName(emotion)
         if emotion_name in stats_dict:
-            stats_dict[f"{emotion_name}_stdv"] = math.sqrt(stats_dict[f"{emotion_name}_stdv"] / stats_dict["days"])
+            stats['results'][f"{emotion_name}_stdv"] = stats_dict[f"{emotion_name}_stdv"] = math.sqrt(stats_dict[f"{emotion_name}_stdv"] / stats_dict["days"])
 
     csv_file.close()
