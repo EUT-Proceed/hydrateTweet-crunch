@@ -177,7 +177,7 @@ def main(
     csv_file = fu.open_csv_file(input_file_path)
     csv_reader = csv.DictReader(csv_file)
     for line in csv_reader:
-        stats['performance']['input']['lines'] = datetime.datetime.utcnow()
+        stats['performance']['input']['lines'] += 1
         csv_row = new_emotions_dict()
         csv_row["date"] = line["date"]
         for emotion in Emotions:
