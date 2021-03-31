@@ -1,5 +1,5 @@
 """
-Analyse the text from tweets and generate a file which contains statistics w.r.t emotions.
+Analyse all the tweets and store informations about users such as the screen name, the amount of tweets and the number of days the user tweeted.
 
 The output format is csv.
 """
@@ -10,6 +10,7 @@ import re
 import argparse
 import datetime
 from pathlib import Path
+from m3inference import M3Twitter
 
 from typing import Iterable, Iterator, Mapping, Counter
 
@@ -54,11 +55,20 @@ stats_template_finalize = '''
 fieldnames = [
     "id",
     "screen_name",
+    "name",
     "tweets",
     "days_tweeted",
     "location",
+    "description",
+    "gender",
+    "gender_acc",
+    "age",
+    "age_acc",
+    "org",
+    "org_acc",
     "followers_count",
     "statuses_count",
+    "profile_image_url_https",
     "last_tweet"
 ]
 
@@ -67,12 +77,14 @@ def process_lines(
         dump: Iterable[list],
         stats: Mapping,
         shared: dict,
-        date:datetime
+        date:datetime,
+        args:argparse.Namespace
         ) -> None:
     """Assign each revision to the snapshot or snapshots to which they
        belong.
     """
     lang = None
+    m3twitter=M3Twitter(cache_dir=f"{args.output_dir_path}/twitter_cache")
     for raw_obj in dump:
         # extract the language first: if the language is not in shared, add it
         lang = raw_obj['lang']
@@ -85,6 +97,42 @@ def process_lines(
         if not user_id in lang_dict:
             stats['performance']['input']['users'] += 1
             lang_dict[user_id] = init_user(raw_obj, date)
+
+            # infer user data only the first time and update the fields in the user's dict
+            user_to_infer = m3twitter.transform_jsonl_object(raw_obj)
+            inferred_user = m3twitter.infer([user_to_infer])
+            if user_id in inferred_user:
+                user = lang_dict[user_id]
+                inferred_user_stats = inferred_user[user_id]
+
+                inferred_gender = inferred_user_stats['gender']
+                if inferred_gender['female'] >= inferred_gender['male']:
+                    user['gender'] = 'female'
+                    user['gender_acc'] = inferred_gender['female']
+                else:
+                    user['gender'] = 'male'
+                    user['gender_acc'] = inferred_gender['male']
+
+                inferred_age = inferred_user_stats['age']
+                for age_index in inferred_age:
+                    if inferred_age[age_index] > user['age_acc']:
+                        user['age_acc'] = inferred_age[age_index]
+                        user['age'] = age_index
+
+                inferred_org = inferred_user_stats['org']
+                if inferred_org['is-org'] >= inferred_org['non-org']:
+                    user['org'] = True
+                    user['org_acc'] = inferred_org['is-org']
+                else:
+                    user['org'] = False
+                    user['org_acc'] = inferred_org['non-org']
+            # remove the picture downloaded
+            if os.path.exists(user_to_infer['img_path']):
+                try:
+                    os.remove(user_to_infer['img_path'])
+                except:
+                    utils.log("The image exists but couldn't be removed")
+
         user = lang_dict[user_id]
 
         user['tweets'] += 1
@@ -100,15 +148,24 @@ def process_lines(
 
 
 def init_user(raw_obj, date:datetime) -> dict:
-    user = raw_obj['user']
+    user = raw_obj["user"]
     return {
-        "id": int(user['id']),
-        "screen_name": user['screen_name'],
+        "id": int(user["id"]),
+        "screen_name": user["screen_name"],
+        "name": user["name"],
         "tweets": 0,
         "days_tweeted": 1,
         "location": user["location"],
+        "description": user["description"],
+        "gender": "",
+        "gender_acc": -1,
+        "age": "",
+        "age_acc": -1,
+        "org": False,
+        "org_acc": -1,
         "followers_count": int(user["followers_count"]),
         "statuses_count": int(user["statuses_count"]),
+        "profile_image_url_https": user["profile_image_url_https"],
         "last_tweet": date
     }
 
@@ -151,7 +208,8 @@ def main(
         dump,
         stats=stats,
         shared=shared,
-        date=date
+        date=date,
+        args=args
     )
 
     stats_output = open(os.devnull, 'wt')

@@ -9,10 +9,15 @@ from datetime import datetime
 
 def __parse_user(userdct: Mapping) -> Mapping:
     return {"id": int(userdct["id"]),
+            "id_str": userdct["id_str"],
             "screen_name": userdct["screen_name"],
+            "name": userdct["name"],
+            "description": userdct["description"],
             "location": userdct["location"],
             "followers_count": int(userdct["followers_count"]),
-            "statuses_count": int(userdct["statuses_count"])
+            "statuses_count": int(userdct["statuses_count"]),
+            "default_profile_image": userdct["default_profile_image"],
+            "profile_image_url_https": userdct["profile_image_url_https"]
             }
 
 
