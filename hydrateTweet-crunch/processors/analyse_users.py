@@ -85,6 +85,7 @@ def process_lines(
     """
     lang = None
     m3twitter=M3Twitter(cache_dir=f"{args.output_dir_path}/twitter_cache")
+    m3twitter_no_img=M3Twitter(use_full_model=False)
     for raw_obj in dump:
         # extract the language first: if the language is not in shared, add it
         lang = raw_obj['lang']
@@ -100,7 +101,17 @@ def process_lines(
 
             # infer user data only the first time and update the fields in the user's dict
             user_to_infer = m3twitter.transform_jsonl_object(raw_obj)
-            inferred_user = m3twitter.infer([user_to_infer])
+            
+            if os.path.exists(user_to_infer['img_path']):
+                try:
+                    inferred_user = m3twitter.infer([user_to_infer])
+                    # remove the picture downloaded
+                    os.remove(user_to_infer['img_path'])
+                except:
+                    utils.log("The image exists but couldn't be removed")
+            else:
+                 inferred_user = m3twitter_no_img.infer([user_to_infer])
+
             if user_id in inferred_user:
                 user = lang_dict[user_id]
                 inferred_user_stats = inferred_user[user_id]
@@ -126,12 +137,6 @@ def process_lines(
                 else:
                     user['org'] = False
                     user['org_acc'] = inferred_org['non-org']
-            # remove the picture downloaded
-            if os.path.exists(user_to_infer['img_path']):
-                try:
-                    os.remove(user_to_infer['img_path'])
-                except:
-                    utils.log("The image exists but couldn't be removed")
 
         user = lang_dict[user_id]
 
