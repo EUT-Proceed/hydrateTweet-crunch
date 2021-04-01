@@ -5,6 +5,7 @@ The output format is csv.
 """
 
 import os
+import shutil
 import io
 import csv
 import json
@@ -13,6 +14,7 @@ import argparse
 import datetime
 from pathlib import Path
 from m3inference import M3Twitter
+from m3inference.consts import TW_DEFAULT_PROFILE_IMG
 
 from typing import Iterable, Iterator, Mapping, Counter
 
@@ -153,6 +155,8 @@ def main(
     )
 
     for obj in res:
+        if not os.path.exists(obj['img_path']):
+            obj['img_path'] = TW_DEFAULT_PROFILE_IMG
         output.write(json.dumps(obj))
         output.write("\n")
     
@@ -244,3 +248,9 @@ def main(
         )
     
     stats_output.close()
+
+    try:
+        utils.log("Deleting cache directory")
+        shutil.rmtree(cache_dir)
+    except OSError as e:
+        utils.log(f"Error: {e.filename} - {e.strerror}.")
