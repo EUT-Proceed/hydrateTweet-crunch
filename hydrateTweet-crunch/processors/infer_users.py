@@ -45,6 +45,19 @@ stats_template = '''
 </stats>
 '''
 
+stats_template2 = '''
+<stats>
+    <performance>
+        <start_time>${stats['performance']['start_time'] | x}</start_time>
+        <end_time>${stats['performance']['end_time'] | x}</end_time>
+        <input>
+            <users>${stats['performance']['input']['users'] | x}</users>
+            <to_infer>${stats['performance']['input']['to_infer'] | x}</to_infer>
+        </input>
+    </performance>
+</stats>
+'''
+
 fieldnames = [
     "id_str",
     "screen_name",
@@ -112,7 +125,7 @@ def configure_subparsers(subparsers):
         help='The minimum number of tweets that a user should have in order to be analysed [default: 1].',
     )
 
-    parser.set_defaults(func=main, which='infer_users')
+    parser.set_defaults(func=main2, which='infer_users')
 
 
 def main(
@@ -252,5 +265,153 @@ def main(
     try:
         utils.log("Deleting cache directory")
         shutil.rmtree(cache_dir)
+    except OSError as e:
+        utils.log(f"Error: {e.filename} - {e.strerror}.")
+
+
+def process_lines2(
+        dump: io.TextIOWrapper,
+        stats: Mapping,
+        args:argparse.Namespace,
+        cache_dir:str
+        ) -> Iterator[list]:
+    """It checks for each line (user) if the number of tweets is above a certain minimum and if
+       it is the case, it uses transform_jsonl_object to get a particular dict to perform 
+       inference later on
+    """
+    m3twitter=M3Twitter(cache_dir=cache_dir, use_full_model=True)
+    m3twitter_no_img=M3Twitter(use_full_model=False)
+
+    for user in dump:
+        stats['performance']['input']['users'] += 1
+        # trasform the object only if the user reached the minimum number of tweets
+        if 'tweets' in user and int(user['tweets']) > args.min_tweets:
+            stats['performance']['input']['to_infer'] += 1
+            user_id = user['id_str']
+            user_dict = init_user(user)
+
+            user_to_infer = m3twitter.transform_jsonl_object(user)
+
+            if os.path.exists(user_to_infer['img_path']):
+                try:
+                    inferred_user = m3twitter.infer([user_to_infer])
+                    # remove the picture downloaded
+                    os.remove(user_to_infer['img_path'])
+                except:
+                    utils.log("The image exists but couldn't be removed")
+            else:
+                 inferred_user = m3twitter_no_img.infer([user_to_infer])
+
+            if user_id in inferred_user:
+                inferred_user_stats = inferred_user[user_id]
+
+                inferred_gender = inferred_user_stats['gender']
+                if inferred_gender['female'] >= inferred_gender['male']:
+                    user_dict['gender'] = 'female'
+                    user_dict['gender_acc'] = inferred_gender['female']
+                else:
+                    user_dict['gender'] = 'male'
+                    user_dict['gender_acc'] = inferred_gender['male']
+
+                inferred_age = inferred_user_stats['age']
+                for age_index in inferred_age:
+                    if inferred_age[age_index] > user_dict['age_acc']:
+                        user_dict['age_acc'] = inferred_age[age_index]
+                        user_dict['age'] = age_index
+
+                inferred_org = inferred_user_stats['org']
+                if inferred_org['is-org'] >= inferred_org['non-org']:
+                    user_dict['org'] = True
+                    user_dict['org_acc'] = inferred_org['is-org']
+                else:
+                    user_dict['org'] = False
+                    user_dict['org_acc'] = inferred_org['non-org']
+            
+            yield user_dict
+
+
+def main2(
+        dump: io.TextIOWrapper,
+        basename: str,
+        args: argparse.Namespace,
+        shared: dict) -> None:
+    """Main function that parses the arguments and writes the output."""
+    stats = {
+        'performance': {
+            'start_time': None,
+            'end_time': None,
+            'input': {
+                'users': 0,
+                'to_infer': 0
+            },
+        },
+    }
+    
+    stats['performance']['start_time'] = datetime.datetime.utcnow()    
+    cache_dir=f"{args.output_dir_path}/twitter_cache"
+
+    # process the dump
+    res = process_lines2(
+        dump,
+        stats=stats,
+        args=args,
+        cache_dir=cache_dir
+    )
+
+    stats_output = open(os.devnull, 'wt')
+    output = open(os.devnull, 'wt')
+    if not args.dry_run:
+        # extract useful info from the name
+        path_list = re.split('-|\.', basename)
+        lang = path_list[0]
+
+        stats_path = f"{args.output_dir_path}/infer-users/stats/{lang}"
+        Path(stats_path).mkdir(parents=True, exist_ok=True)
+        varname = ('{basename}.{func}'
+                   .format(basename=basename,
+                           func='infer-users'
+                           )
+                   )
+        stats_filename = f"{stats_path}/{varname}.stats.xml"
+
+        stats_output = fu.output_writer(
+            path=stats_filename,
+            compression=args.output_compression,
+            mode='wt'
+        )
+
+        file_path = f"{args.output_dir_path}/infer-users"
+        Path(file_path).mkdir(parents=True, exist_ok=True)
+
+        output_filename = f"{file_path}/{lang}-users-inference.csv"
+
+        output = fu.output_writer(
+            path=output_filename,
+            compression=args.output_compression,
+            mode='wt'
+        )
+
+    writer = csv.DictWriter(output, fieldnames=fieldnames)
+    writer.writeheader()
+
+    for user_dict in res:
+        writer.writerow(user_dict)
+
+    output.close()
+
+    stats['performance']['end_time'] = datetime.datetime.utcnow()
+
+    with stats_output:
+        dumper.render_template(
+            stats_template2,
+            stats_output,
+            stats=stats,
+        )
+    
+    stats_output.close()
+
+    try:
+        utils.log("Deleting cache directory")
+        os.rmdir(cache_dir)
     except OSError as e:
         utils.log(f"Error: {e.filename} - {e.strerror}.")
