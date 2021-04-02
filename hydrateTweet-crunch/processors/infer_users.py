@@ -79,6 +79,9 @@ def process_lines(
         if 'tweets' in user and int(user['tweets']) > args.min_tweets:
             stats['performance']['input']['to_infer'] += 1
             shared[user['id_str']] = init_user(user)
+            # handle empty profile_image_url_https
+            if user['profile_image_url_https'] == "":
+                user['default_profile_image'] = True
             yield m3twitter.transform_jsonl_object(user)
 
 def init_user(user:dict) -> dict:
@@ -155,6 +158,7 @@ def main(
     )
 
     for obj in res:
+        # handle error while downloading an image
         if not os.path.exists(obj['img_path']):
             obj['img_path'] = TW_DEFAULT_PROFILE_IMG
         output.write(json.dumps(obj))
