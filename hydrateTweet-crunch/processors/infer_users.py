@@ -40,6 +40,7 @@ stats_template = '''
         <input>
             <users>${stats['performance']['input']['users'] | x}</users>
             <to_infer>${stats['performance']['input']['to_infer'] | x}</to_infer>
+            <img_errors>${stats['performance']['input']['img_errors'] | x}<img_errors>
         </input>
     </performance>
 </stats>
@@ -82,6 +83,7 @@ def process_lines(
             # handle empty profile_image_url_https
             if user['profile_image_url_https'] == "":
                 user['default_profile_image'] = True
+                stats['performance']['input']['img_errors'] += 1
             yield m3twitter.transform_jsonl_object(user)
 
 def init_user(user:dict) -> dict:
@@ -132,7 +134,8 @@ def main(
             'end_infer': None,
             'input': {
                 'users': 0,
-                'to_infer': 0
+                'to_infer': 0,
+                'img_errors': 0
             },
         },
     }
@@ -161,6 +164,7 @@ def main(
         # handle error while downloading an image
         if not os.path.exists(obj['img_path']):
             obj['img_path'] = TW_DEFAULT_PROFILE_IMG
+            stats['performance']['input']['img_errors'] += 1
         output.write(json.dumps(obj))
         output.write("\n")
     

@@ -76,6 +76,8 @@ def process_lines(
         if not user_id in lang_dict:
             stats['performance']['input']['users'] += 1
             lang_dict[user_id] = init_user(raw_obj, date)
+        else:
+            lang_dict[user_id]['profile_image_url_https'] = raw_obj['user']['profile_image_url_https']
         user = lang_dict[user_id]
 
         user['tweets'] += 1
