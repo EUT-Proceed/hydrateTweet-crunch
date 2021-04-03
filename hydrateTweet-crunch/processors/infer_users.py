@@ -141,7 +141,7 @@ def main(
     }
     
     stats['performance']['start_preprocess'] = datetime.datetime.utcnow()    
-    cache_dir=f"{args.output_dir_path}/twitter_cache"
+    cache_dir=f"{args.output_dir_path}/twitter_cache_{os.getpid()}"
     m3twitter=M3Twitter(cache_dir=cache_dir, use_full_model=True)
 
     # process the dump
@@ -181,8 +181,9 @@ def main(
 
         stats_path = f"{args.output_dir_path}/infer-users/stats/{lang}"
         Path(stats_path).mkdir(parents=True, exist_ok=True)
-        varname = ('{basename}.{func}'
+        varname = ('{basename}-{pid}.{func}'
                    .format(basename=basename,
+                           pid=os.getpid(),
                            func='infer-users'
                            )
                    )
@@ -197,7 +198,7 @@ def main(
         file_path = f"{args.output_dir_path}/infer-users"
         Path(file_path).mkdir(parents=True, exist_ok=True)
 
-        output_filename = f"{file_path}/{lang}-users-inference.csv"
+        output_filename = f"{file_path}/{lang}-users-inference-{os.getpid()}.csv"
 
         output = fu.output_writer(
             path=output_filename,
