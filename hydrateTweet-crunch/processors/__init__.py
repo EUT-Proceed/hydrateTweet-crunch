@@ -3,5 +3,6 @@ from . import (
     analyse_emotions,
     analyse_users,
     standardize,
-    infer_users
+    infer_users,
+    download_images
 )

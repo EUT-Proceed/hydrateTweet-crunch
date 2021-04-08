@@ -50,6 +50,7 @@ def get_args():
     processors.analyse_users.configure_subparsers(subparsers)
     processors.standardize.configure_subparsers(subparsers)
     processors.infer_users.configure_subparsers(subparsers)
+    processors.download_images.configure_subparsers(subparsers)
 
     parsed_args = parser.parse_args()
     if 'func' not in parsed_args:

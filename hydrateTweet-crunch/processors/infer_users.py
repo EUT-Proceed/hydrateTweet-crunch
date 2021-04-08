@@ -107,7 +107,7 @@ def configure_subparsers(subparsers):
     """Configure a new subparser ."""
     parser = subparsers.add_parser(
         'infer-users',
-        help="Given .json file of users it infers gender, age and if it's an organization using m3inference",
+        help="Given json file of users it infers gender, age and if it's an organization using m3inference",
     )
     parser.add_argument(
         '--min-tweets',
@@ -115,6 +115,13 @@ def configure_subparsers(subparsers):
         required=False,
         default=1,
         help='The minimum number of tweets that a user should have in order to be analysed [default: 1].',
+    )
+    parser.add_argument(
+        '--cache-dir',
+        type=str,
+        required=False,
+        default=str(os.getpid()),
+        help='The name of the cache directory used by m3inference: parameter is appended to \"twitter_cache_\" [default: twitter_cache_PID].'
     )
 
     parser.set_defaults(func=main, which='infer_users')
@@ -140,8 +147,8 @@ def main(
         },
     }
     
-    stats['performance']['start_preprocess'] = datetime.datetime.utcnow()    
-    cache_dir=f"{args.output_dir_path}/twitter_cache_{os.getpid()}"
+    stats['performance']['start_preprocess'] = datetime.datetime.utcnow()
+    cache_dir=f"{args.output_dir_path}/twitter_cache_{args.cache_dir}"
     m3twitter=M3Twitter(cache_dir=cache_dir, use_full_model=True)
 
     # process the dump
@@ -171,6 +178,10 @@ def main(
     output.close()
 
     stats['performance']['end_preprocess'] = datetime.datetime.utcnow()
+
+    stats['performance']['start_infer'] = datetime.datetime.utcnow()
+    
+    inferred_users = m3twitter.infer(m3_input_file)
 
     stats_output = open(os.devnull, 'wt')
     output = open(os.devnull, 'wt')
@@ -205,10 +216,6 @@ def main(
             compression=args.output_compression,
             mode='wt'
         )
-
-    stats['performance']['start_infer'] = datetime.datetime.utcnow()
-    
-    inferred_users = m3twitter.infer(m3_input_file)
 
     utils.log('Writing the results...')
 
