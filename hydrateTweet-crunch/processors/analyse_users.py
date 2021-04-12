@@ -116,6 +116,13 @@ def configure_subparsers(subparsers):
         'analyse-users',
         help='Analyse users from tweets and generate a file which contains info about every user and their number of tweets.',
     )
+    parser.add_argument(
+        '--min-tweets',
+        type=int,
+        required=False,
+        default=1,
+        help='The minimum number of tweets that a user should have in order to be analysed [default: 1].',
+    )
 
     parser.set_defaults(func=main, finalize=write_users, which='analyse_users')
 
@@ -234,8 +241,9 @@ def write_users(
             stats['performance']['input']['users'] += 1
             user = shared[lang][user_id]
             del user['last_tweet']
-            output.write(json.dumps(user))
-            output.write("\n")
+            if user['days_tweeted'] >= args.min_tweets:
+                output.write(json.dumps(user))
+                output.write("\n")
         
         output.close
 

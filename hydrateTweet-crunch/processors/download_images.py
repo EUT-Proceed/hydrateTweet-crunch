@@ -74,7 +74,7 @@ def process_lines(
     for user in dump:
         stats['performance']['input']['users'] += 1
         # download the image only if the user reached the minimum number of tweets
-        if 'tweets' in user and int(user['tweets']) > args.min_tweets:
+        if 'tweets' in user and int(user['tweets']) >= args.min_tweets:
             img_path = user["profile_image_url_https"]
             if img_path != "" and not user['default_profile_image']:
                 stats['performance']['input']['to_download'] += 1
@@ -94,8 +94,8 @@ def configure_subparsers(subparsers):
         '--min-tweets',
         type=int,
         required=False,
-        default=1,
-        help='The minimum number of tweets that a user should have in order to be analysed [default: 1].',
+        default=2,
+        help='The minimum number of tweets that a user should have in order to be analysed [default: 2].',
     )
     parser.add_argument(
         '--cache-dir',
@@ -147,7 +147,7 @@ def main(
         varname = ('{basename}-{pid}.{func}'
                    .format(basename=basename,
                            pid=os.getpid(),
-                           func='infer-users'
+                           func='download-images'
                            )
                    )
         stats_filename = f"{stats_path}/{varname}.stats.xml"

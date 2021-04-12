@@ -77,7 +77,7 @@ def process_lines(
     for user in dump:
         stats['performance']['input']['users'] += 1
         # trasform the object only if the user reached the minimum number of tweets
-        if 'tweets' in user and int(user['tweets']) > args.min_tweets:
+        if 'tweets' in user and int(user['tweets']) >= args.min_tweets:
             stats['performance']['input']['to_infer'] += 1
             shared[user['id_str']] = init_user(user)
             # handle empty profile_image_url_https
@@ -113,8 +113,8 @@ def configure_subparsers(subparsers):
         '--min-tweets',
         type=int,
         required=False,
-        default=1,
-        help='The minimum number of tweets that a user should have in order to be analysed [default: 1].',
+        default=2,
+        help='The minimum number of tweets that a user should have in order to be analysed [default: 2].',
     )
     parser.add_argument(
         '--cache-dir',
