@@ -24,19 +24,6 @@ from pprint import pprint
 # print a dot each NTWEET tweets
 NTWEET = 10000
 
-# templates
-stats_template = '''
-<stats>
-    <performance>
-        <start_time>${stats['performance']['start_time'] | x}</start_time>
-        <end_time>${stats['performance']['end_time'] | x}</end_time>
-        <input>
-            <objects>${stats['performance']['input']['objects'] | x}</objects>
-        </input>
-    </performance>
-</stats>
-'''
-
 
 def configure_subparsers(subparsers):
     """Configure a new subparser ."""
@@ -68,21 +55,10 @@ def main(
         shared) -> None:
     """Main function that parses the date contained in the field 'created_at' 
        of the json and the arguments and writes the output."""
-    stats = {
-        'performance': {
-            'start_time': None,
-            'end_time': None,
-            'input': {
-                'objects': 0
-            },
-        },
-    }
 
     desr_dict = {}
-    stats['performance']['start_time'] = datetime.datetime.utcnow()
 
     output = open(os.devnull, 'wt')
-    stats_output = open(os.devnull, 'wt')
 
     if not args.dry_run:
         stats_path = f"{args.output_dir_path}/aggregate-tweets/stats"
@@ -104,15 +80,23 @@ def main(
     path_list = basename.split('-')
 
     for obj in dump:
-        stats['performance']['input']['objects'] += 1
         year = 'Err'
-        pool = 'Err'
+        month = 'Err'
+        day = 'Err'
         lang = 'Err'
         if 'created_at' in obj and 'lang' in obj:
             try:
                 date_obj = parser.parse(obj['created_at'])
                 year = date_obj.strftime("%Y")
                 pool = int(date_obj.strftime("%j"))//args.n_days
+                start_day = pool*args.n_days
+                if start_day < 10:
+                    start_day = f'0{start_day}'
+                else:
+                    start_day = str(start_day)
+                start_date = datetime.datetime.strptime(start_day, "%j")
+                month = start_date.strftime("%d")
+                day = start_date.strftime("%m")
                 lang = obj['lang']
             except:
                 utils.log(f"Error while parsing the date {obj['created_at']}")
@@ -122,7 +106,7 @@ def main(
                 file_path = f"{args.output_dir_path}/aggregate-tweets/{lang}/{year}"
                 Path(file_path).mkdir(parents=True, exist_ok=True)
 
-                output_filename = f"{file_path}/{path_list[0]}-{path_list[1]}-{pool}.json"
+                output_filename = f"{file_path}/{path_list[0]}-{path_list[1]}-{year}-{month}-{day}.json"
                 
                 # Save the descriptor for that particular language
                 desr_dict[obj['lang']] = fu.output_writer(
@@ -137,13 +121,3 @@ def main(
         output.write("\n")
     
     close_all_descriptors(desr_dict)
-
-    stats['performance']['end_time'] = datetime.datetime.utcnow()
-    with stats_output:
-        dumper.render_template(
-            stats_template,
-            stats_output,
-            stats=stats,
-        )
-    
-    stats_output.close()
