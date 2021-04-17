@@ -60,23 +60,6 @@ def main(
 
     output = open(os.devnull, 'wt')
 
-    if not args.dry_run:
-        stats_path = f"{args.output_dir_path}/aggregate-tweets/stats"
-        Path(stats_path).mkdir(parents=True, exist_ok=True)
-        varname = ('{basename}.{func}'
-                   .format(basename=basename,
-                           func='aggregate-tweets'
-                           )
-                   )
-        
-        stats_filename = f"{stats_path}/{varname}.stats.xml"
-
-        stats_output = fu.output_writer(
-            path=stats_filename,
-            compression=args.output_compression,
-            mode='wt'
-        )
-
     path_list = basename.split('-')
 
     for obj in dump:
@@ -95,8 +78,8 @@ def main(
                 else:
                     start_day = str(start_day)
                 start_date = datetime.datetime.strptime(start_day, "%j")
-                month = start_date.strftime("%d")
-                day = start_date.strftime("%m")
+                month = start_date.strftime("%m")
+                day = start_date.strftime("%d")
                 lang = obj['lang']
             except:
                 utils.log(f"Error while parsing the date {obj['created_at']}")
