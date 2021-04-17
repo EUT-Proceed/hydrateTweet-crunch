@@ -4,5 +4,6 @@ from . import (
     analyse_users,
     standardize,
     infer_users,
-    download_images
+    download_images,
+    aggregate_tweets
 )
