@@ -35,7 +35,7 @@ def configure_subparsers(subparsers):
         '--n-days',
         type=int,
         required=True,
-        choices=range(1, 367),
+        choices=range(2, 367),
         help='The number of days that will be used to aggregate tweets together'
     )
 
@@ -71,12 +71,8 @@ def main(
             try:
                 date_obj = parser.parse(obj['created_at'])
                 year = date_obj.strftime("%Y")
-                pool = int(date_obj.strftime("%j"))//args.n_days
-                start_day = pool*args.n_days
-                if start_day < 10:
-                    start_day = f'0{start_day}'
-                else:
-                    start_day = str(start_day)
+                pool = (int(date_obj.strftime("%-j"))-1)//args.n_days
+                start_day = str((pool*args.n_days)+1)
                 start_date = datetime.datetime.strptime(start_day, "%j")
                 month = start_date.strftime("%m")
                 day = start_date.strftime("%d")
@@ -86,7 +82,7 @@ def main(
 
         if not args.dry_run:
             if not obj['lang'] in desr_dict:
-                file_path = f"{args.output_dir_path}/aggregate-tweets/{lang}/{year}"
+                file_path = f"{args.output_dir_path}/aggregate-tweets/groups_of_{args.n_days}_days/{lang}/{year}"
                 Path(file_path).mkdir(parents=True, exist_ok=True)
 
                 output_filename = f"{file_path}/{path_list[0]}-{path_list[1]}-{year}-{month}-{day}.json"
