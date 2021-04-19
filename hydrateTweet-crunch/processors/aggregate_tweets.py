@@ -81,20 +81,21 @@ def main(
                 utils.log(f"Error while parsing the date {obj['created_at']}")
 
         if not args.dry_run:
-            if not obj['lang'] in desr_dict:
+            descriptor = f'{lang}-{year}/{month}/{day}'
+            if not descriptor in desr_dict:
                 file_path = f"{args.output_dir_path}/aggregate-tweets/groups_of_{args.n_days}_days/{lang}/{year}"
                 Path(file_path).mkdir(parents=True, exist_ok=True)
 
                 output_filename = f"{file_path}/{path_list[0]}-{path_list[1]}-{year}-{month}-{day}.json"
                 
                 # Save the descriptor for that particular language
-                desr_dict[obj['lang']] = fu.output_writer(
+                desr_dict[descriptor] = fu.output_writer(
                     path=output_filename,
                     compression=args.output_compression,
                 )
 
             # Retrieve the descriptor for that particular language
-            output = desr_dict[obj['lang']]
+            output = desr_dict[descriptor]
 
         output.write(json.dumps(obj))
         output.write("\n")
