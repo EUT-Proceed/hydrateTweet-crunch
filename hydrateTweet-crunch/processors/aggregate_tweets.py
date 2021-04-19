@@ -72,8 +72,8 @@ def main(
                 date_obj = parser.parse(obj['created_at'])
                 year = date_obj.strftime("%Y")
                 pool = (int(date_obj.strftime("%-j"))-1)//args.n_days
-                start_day = str((pool*args.n_days)+1)
-                start_date = datetime.datetime.strptime(start_day, "%j")
+                start_day = f'{(pool*args.n_days)+1} {year}'
+                start_date = datetime.datetime.strptime(start_day, "%j %Y")
                 month = start_date.strftime("%m")
                 day = start_date.strftime("%d")
                 lang = obj['lang']
