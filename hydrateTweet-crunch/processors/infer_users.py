@@ -235,10 +235,12 @@ def main(
                 user_dict['gender_acc'] = inferred_gender['male']
 
             inferred_age = inferred_user_stats['age']
-            for age_index in inferred_age:
-                if inferred_age[age_index] > user_dict['age_acc']:
-                    user_dict['age_acc'] = inferred_age[age_index]
-                    user_dict['age'] = age_index
+            if inferred_age['>=40'] >= 1 - inferred_age['>=40']:
+                user_dict['age'] = '>=40'
+                user_dict['age_acc'] = inferred_age['>=40']
+            else:
+                user_dict['age'] = '<40'
+                user_dict['age_acc'] = 1 - inferred_age['>=40']
 
             inferred_org = inferred_user_stats['org']
             if inferred_org['is-org'] >= inferred_org['non-org']:
