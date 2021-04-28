@@ -57,6 +57,10 @@ fieldnames = [
     "gender_acc",
     "age",
     "age_acc",
+    "age_>=40_acc",
+    "age_30-39_acc",
+    "age_19-29_acc",
+    "age_<=18_acc",
     "org",
     "org_acc"
 ]
@@ -98,6 +102,10 @@ def init_user(user:dict) -> dict:
         "gender_acc": -1,
         "age": "",
         "age_acc": -1,
+        "age_>=40_acc": -1,
+        "age_30-39_acc": -1,
+        "age_19-29_acc": -1,
+        "age_<=18_acc": -1,
         "org": False,
         "org_acc": -1
     }
@@ -235,6 +243,10 @@ def main(
                 user_dict['gender_acc'] = inferred_gender['male']
 
             inferred_age = inferred_user_stats['age']
+
+            for age, accuracy in inferred_age.items():
+                user_dict[f'age_{age}_acc'] = accuracy
+
             if inferred_age['>=40'] >= 1 - inferred_age['>=40']:
                 user_dict['age'] = '>=40'
                 user_dict['age_acc'] = inferred_age['>=40']

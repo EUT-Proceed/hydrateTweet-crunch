@@ -8,6 +8,7 @@ import os
 import json
 import argparse
 import datetime
+import arrow
 from dateutil import parser
 from pathlib import Path
 
@@ -32,10 +33,10 @@ def configure_subparsers(subparsers):
         help='Aggregates in a single file tweets of the same pool of days, year and language',
     )
     parser.add_argument(
-        '--n-days',
-        type=int,
-        required=True,
-        choices=range(2, 367),
+        '--type',
+        type=str,
+        default='week',
+        choices={'week'},
         help='The number of days that will be used to aggregate tweets together'
     )
 
@@ -69,11 +70,9 @@ def main(
         lang = 'Err'
         if 'created_at' in obj and 'lang' in obj:
             try:
-                date_obj = parser.parse(obj['created_at'])
-                year = date_obj.strftime("%Y")
-                pool = (int(date_obj.strftime("%-j"))-1)//args.n_days
-                start_day = f'{(pool*args.n_days)+1} {year}'
-                start_date = datetime.datetime.strptime(start_day, "%j %Y")
+                date = arrow.get(obj['created_at'], "ddd MMM DD HH:mm:ss Z YYYY")
+                start_date = date.shift(days=-int(date.weekday()))
+                year = start_date.year
                 month = start_date.strftime("%m")
                 day = start_date.strftime("%d")
                 lang = obj['lang']
@@ -83,7 +82,7 @@ def main(
         if not args.dry_run:
             descriptor = f'{lang}-{year}/{month}/{day}'
             if not descriptor in desr_dict:
-                file_path = f"{args.output_dir_path}/aggregate-tweets/groups_of_{args.n_days}_days/{lang}/{year}"
+                file_path = f"{args.output_dir_path}/aggregate-tweets/groupby_{args.type}/{lang}"
                 Path(file_path).mkdir(parents=True, exist_ok=True)
 
                 output_filename = f"{file_path}/{path_list[0]}-{path_list[1]}-{year}-{month}-{day}.json"
