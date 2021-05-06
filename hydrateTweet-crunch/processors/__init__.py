@@ -5,5 +5,6 @@ from . import (
     standardize,
     infer_users,
     download_images,
-    aggregate_tweets
+    aggregate_tweets,
+    filter_inferred
 )

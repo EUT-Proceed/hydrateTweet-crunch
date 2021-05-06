@@ -238,10 +238,10 @@ def write_users(
             )
 
         for user_id in shared[lang]:
-            stats['performance']['input']['users'] += 1
             user = shared[lang][user_id]
             del user['last_tweet']
             if int(user['tweets']) >= args.min_tweets:
+                stats['performance']['input']['users'] += 1
                 output.write(json.dumps(user))
                 output.write("\n")
         
