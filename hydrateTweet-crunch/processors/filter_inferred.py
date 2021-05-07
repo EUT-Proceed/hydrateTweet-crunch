@@ -53,6 +53,10 @@ def process_lines(
     csv_reader = csv.DictReader(dump)
     for inferred_user in csv_reader:
         stats['performance']['input']['total'] += 1
+        nobjs = stats['performance']['input']['total']
+        if (nobjs-1) % NTWEET == 0:
+            utils.dot()
+            
         if inferred_user['org'] == 'True' and float(inferred_user['org_acc']) >= args.org_acc:
             inferred_user['category'] = 'org'
         elif float(inferred_user['gender_acc']) >= args.gender_acc:
