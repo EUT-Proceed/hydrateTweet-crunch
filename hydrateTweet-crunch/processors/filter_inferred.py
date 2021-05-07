@@ -6,7 +6,6 @@ The output format is csv.
 """
 
 import os
-import io
 import csv
 import re
 import argparse
@@ -43,6 +42,7 @@ stats_template = '''
 </stats>
 '''
 
+
 def process_lines(
         dump: TextIO,
         stats: Mapping,
@@ -50,44 +50,17 @@ def process_lines(
     """Assign each revision to the snapshot or snapshots to which they
        belong.
     """
-    #csv_reader = csv.DictReader(dump)
-    #for inferred_user in csv_reader:
-    fieldnames = [
-        "id_str",
-        "screen_name",
-        "name",
-        "tweets",
-        "days_tweeted",
-        "location",
-        "gender",
-        "gender_acc",
-        "age",
-        "age_acc",
-        "age_>=40_acc",
-        "age_30-39_acc",
-        "age_19-29_acc",
-        "age_<=18_acc",
-        "org",
-        "org_acc"
-    ]
-    for line in dump.readlines()[1:]:
-        line = line.encode('utf-32').decode('utf-32')
-        f = io.StringIO(line)
-        csv_reader = csv.DictReader(f, fieldnames)
-        for inferred_user in csv_reader:
-            stats['performance']['input']['total'] += 1
-            nobjs = stats['performance']['input']['total']
-            if (nobjs-1) % NTWEET == 0:
-                utils.dot()
+    csv_reader = csv.DictReader(dump)
+    for inferred_user in csv_reader:
+        stats['performance']['input']['total'] += 1
+        if inferred_user['org'] == 'True' and float(inferred_user['org_acc']) >= args.org_acc:
+            inferred_user['category'] = 'org'
+        elif float(inferred_user['gender_acc']) >= args.gender_acc:
+            inferred_user['category'] = inferred_user['gender']
 
-            if inferred_user['org'] == 'True' and float(inferred_user['org_acc']) >= args.org_acc:
-                inferred_user['category'] = 'org'
-            elif float(inferred_user['gender_acc']) >= args.gender_acc:
-                inferred_user['category'] = inferred_user['gender']
-
-            if 'category' in inferred_user:
-                stats['performance']['input'][inferred_user['category']] += 1
-                yield inferred_user
+        if 'category' in inferred_user:
+            stats['performance']['input'][inferred_user['category']] += 1
+            yield inferred_user
 
 
 def configure_subparsers(subparsers):
