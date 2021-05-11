@@ -50,7 +50,9 @@ def process_lines(
     """Assign each revision to the snapshot or snapshots to which they
        belong.
     """
-    csv_reader = csv.DictReader(dump)
+
+    # fix to avoid crash due to NUL character inside of a string 
+    csv_reader = csv.DictReader((line.replace('\0', '') for line in dump))
     for inferred_user in csv_reader:
         stats['performance']['input']['total'] += 1
         nobjs = stats['performance']['input']['total']
