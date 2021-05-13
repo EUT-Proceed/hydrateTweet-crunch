@@ -222,12 +222,10 @@ def process_tweet(
         category = f'{valid_user[user_id]}_'
     else:
         category = ''
-    if not user_id in users_dict:
-        if not args.per_tweet:
-            users_dict[user_id] = new_emotions_dict()
-            stats_dict[f'{category}total'] += 1
-        else:
-            users_dict[user_id] = 0
+        
+    if not user_id in users_dict and not args.per_tweet:
+        users_dict[user_id] = new_emotions_dict()
+        stats_dict[f'{category}total'] += 1
         stats['performance']['input']['users'] += 1
 
     if args.per_tweet:
@@ -277,8 +275,10 @@ def configure_subparsers(subparsers):
     )
     parser.add_argument(
         '--per-category', '-c',
-        action='store_true',
-        help='Calculate statistics w.r.t three main categories (male, female, org)',
+        choices={'over-category', 'over-total'},
+        required=False,
+        default='over-category',
+        help='Calculate statistics w.r.t three main categories (male, female, org) over the specific category or over the total',
     )
     parser.add_argument(
         '--standardize', '-s',
@@ -297,8 +297,13 @@ def calculate_emotions(
         if args.per_category:
             for category in ['male', 'female', 'org']:
                 emotion_category_name = f"{category}_{emotion_name}"
+                if args.per_category == 'over-category':
+                    divider = stats_dict[f'{category}_total']
+                else: 
+                    divider = stats_dict[f'male_total'] + stats_dict[f'female_total'] + stats_dict[f'org_total']
+
                 if emotion_name in RELEVANT_EMOTIONS and stats_dict[f'{category}_total'] > 0:
-                    stats_dict[emotion_category_name] = stats_dict[f'{emotion_category_name}_count']/stats_dict[f'{category}_total']
+                    stats_dict[emotion_category_name] = stats_dict[f'{emotion_category_name}_count']/divider
         else:
             if emotion_name in RELEVANT_EMOTIONS and stats_dict['total'] > 0:
                 stats_dict[emotion_name] = stats_dict[f'{emotion_name}_count']/stats_dict['total']
@@ -447,7 +452,7 @@ def standardize(
         for emotion in Emotions:
             emotion_name = getEmotionName(emotion)
             if emotion_name in RELEVANT_EMOTIONS:
-                if args.per_category:
+                if args.per_category and args.per_category == 'over-category':
                     for category in ['male', 'female', 'org']:
                         emotion_category_name = f"{category}_{emotion_name}"
                         stats_dict[f"{emotion_category_name}_mean"] = 0
@@ -509,8 +514,13 @@ def standardize(
                         for category in ['male', 'female', 'org']:
                             emotion_category_name = f"{category}_{emotion_name}"
                             emotion_value = float(line[emotion_category_name])
-                            mean = stats_dict[f"{emotion_category_name}_mean"]
-                            stdv = stats_dict[f"{emotion_category_name}_stdv"]
+                            if args.per_category == 'over-category':
+                                mean = stats_dict[f"{emotion_category_name}_mean"]
+                                stdv = stats_dict[f"{emotion_category_name}_stdv"]
+                            else:
+                                mean = stats_dict[f"{emotion_name}_mean"]
+                                stdv = stats_dict[f"{emotion_name}_stdv"]
+                                
                             try:
                                 csv_row[emotion_category_name] = (emotion_value - mean) / stdv
                             except:
@@ -554,7 +564,10 @@ def calculate_means(
                 if args.per_category:
                     for category in ['male', 'female', 'org']:
                         emotion_category_name = f"{category}_{emotion_name}"
-                        stats_dict[f"{emotion_category_name}_mean"] += float(line[emotion_category_name])
+                        if args.per_category == 'over-category':
+                            stats_dict[f"{emotion_category_name}_mean"] += float(line[emotion_category_name])
+                        else: 
+                            stats_dict[f"{emotion_name}_mean"] += float(line[emotion_category_name])
                 else:
                     stats_dict[f"{emotion_name}_mean"] += float(line[emotion_name])
     
@@ -565,7 +578,10 @@ def calculate_means(
                     for category in ['male', 'female', 'org']:
                         emotion_category_name = f"{category}_{emotion_name}"
                         stats_dict[f"{emotion_category_name}_mean"] /= stats_dict["days"]
-                        stats['results'][f"{emotion_category_name}_mean"] = stats_dict[f"{emotion_category_name}_mean"]
+                        if args.per_category == 'over-category':
+                            stats['results'][f"{emotion_category_name}_mean"] = stats_dict[f"{emotion_category_name}_mean"]
+                        else:
+                            stats['results'][f"{emotion_category_name}_mean"] = stats_dict[f"{emotion_name}_mean"]
                 else:
                     stats_dict[f"{emotion_name}_mean"] /= stats_dict["days"]
                     stats['results'][f"{emotion_name}_mean"] = stats_dict[f"{emotion_name}_mean"]
@@ -587,9 +603,13 @@ def calculate_stdvs(
                 if args.per_category:
                     for category in ['male', 'female', 'org']:
                         emotion_category_name = f"{category}_{emotion_name}"
-                        mean = stats_dict[f"{emotion_category_name}_mean"]
                         emotion_value = float(line[emotion_category_name])
-                        stats_dict[f"{emotion_category_name}_stdv"] += pow(emotion_value - mean, 2)
+                        if args.per_category == 'over-category':
+                            mean = stats_dict[f"{emotion_category_name}_mean"]
+                            stats_dict[f"{emotion_category_name}_stdv"] += pow(emotion_value - mean, 2)
+                        else:
+                            mean = stats_dict[f"{emotion_name}_mean"]
+                            stats_dict[f"{emotion_name}_stdv"] += pow(emotion_value - mean, 2) 
                 else:
                     mean = stats_dict[f"{emotion_name}_mean"]
                     emotion_value = float(line[emotion_name])
@@ -601,7 +621,10 @@ def calculate_stdvs(
             if args.per_category:
                 for category in ['male', 'female', 'org']:
                     emotion_category_name = f"{category}_{emotion_name}"
-                    stats['results'][f"{emotion_category_name}_stdv"] = stats_dict[f"{emotion_category_name}_stdv"] = math.sqrt(stats_dict[f"{emotion_category_name}_stdv"] / stats_dict["days"])
+                    if args.per_category == 'over-category':
+                        stats['results'][f"{emotion_category_name}_stdv"] = stats_dict[f"{emotion_category_name}_stdv"] = math.sqrt(stats_dict[f"{emotion_category_name}_stdv"] / stats_dict["days"])
+                    else:
+                        stats['results'][f"{emotion_category_name}_stdv"] = stats_dict[f"{emotion_name}_stdv"] = math.sqrt(stats_dict[f"{emotion_name}_stdv"] / stats_dict["days"])
             else:
                 stats['results'][f"{emotion_name}_stdv"] = stats_dict[f"{emotion_name}_stdv"] = math.sqrt(stats_dict[f"{emotion_name}_stdv"] / stats_dict["days"])
 
