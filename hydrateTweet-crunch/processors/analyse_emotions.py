@@ -223,7 +223,7 @@ def process_tweet(
     else:
         category = ''
         
-    if not user_id in users_dict and not args.per_tweet:
+    if (not user_id in users_dict) and (not args.per_tweet):
         users_dict[user_id] = new_emotions_dict()
         stats_dict[f'{category}total'] += 1
         stats['performance']['input']['users'] += 1
@@ -385,7 +385,7 @@ def main(
             if args.per_tweet:
                 output_filename = f"{file_path}/{lang}-{path_list[0]}-{path_list[1]}-per-tweet.csv"
             elif args.per_category == 'over-category':
-                output_filename = f"{file_path}/{lang}-{path_list[0]}-{path_list[1]}-per-category.csv"
+                output_filename = f"{file_path}/{lang}-{path_list[0]}-{path_list[1]}-per-category-over-category.csv"
             elif args.per_category == 'over-total':
                 output_filename = f"{file_path}/{lang}-{path_list[0]}-{path_list[1]}-per-category-over-total.csv"
             else:
