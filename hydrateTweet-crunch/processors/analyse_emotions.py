@@ -579,10 +579,11 @@ def calculate_means(
                 if args.per_category:
                     for category in ['male', 'female', 'org']:
                         emotion_category_name = f"{category}_{emotion_name}"
-                        stats_dict[f"{emotion_category_name}_mean"] /= stats_dict["days"]
                         if args.per_category == 'over-category':
+                            stats_dict[f"{emotion_category_name}_mean"] /= stats_dict["days"]
                             stats['results'][f"{emotion_category_name}_mean"] = stats_dict[f"{emotion_category_name}_mean"]
                         else:
+                            stats_dict[f"{emotion_name}_mean"] /= stats_dict["days"]
                             stats['results'][f"{emotion_category_name}_mean"] = stats_dict[f"{emotion_name}_mean"]
                 else:
                     stats_dict[f"{emotion_name}_mean"] /= stats_dict["days"]
