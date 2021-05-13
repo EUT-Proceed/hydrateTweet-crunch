@@ -277,8 +277,8 @@ def configure_subparsers(subparsers):
         '--per-category', '-c',
         choices={'over-category', 'over-total'},
         required=False,
-        default='over-category',
-        help='Calculate statistics w.r.t three main categories (male, female, org) over the specific category or over the total',
+        default=None,
+        help='Calculate statistics w.r.t three main categories (male, female, org) over the specific category or over the total [default: None]',
     )
     parser.add_argument(
         '--standardize', '-s',
@@ -384,8 +384,10 @@ def main(
 
             if args.per_tweet:
                 output_filename = f"{file_path}/{lang}-{path_list[0]}-{path_list[1]}-per-tweet.csv"
-            elif args.per_category:
+            elif args.per_category == 'over-category':
                 output_filename = f"{file_path}/{lang}-{path_list[0]}-{path_list[1]}-per-category.csv"
+            elif args.per_category == 'over-total':
+                output_filename = f"{file_path}/{lang}-{path_list[0]}-{path_list[1]}-per-category-over-total.csv"
             else:
                 output_filename = f"{file_path}/{lang}-{path_list[0]}-{path_list[1]}.csv"
 
@@ -520,7 +522,7 @@ def standardize(
                             else:
                                 mean = stats_dict[f"{emotion_name}_mean"]
                                 stdv = stats_dict[f"{emotion_name}_stdv"]
-                                
+
                             try:
                                 csv_row[emotion_category_name] = (emotion_value - mean) / stdv
                             except:
