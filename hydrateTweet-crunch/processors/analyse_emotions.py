@@ -297,13 +297,8 @@ def calculate_emotions(
         if args.per_category:
             for category in ['male', 'female', 'org']:
                 emotion_category_name = f"{category}_{emotion_name}"
-                if args.per_category == 'over-category':
-                    divider = stats_dict[f'{category}_total']
-                else: 
-                    divider = stats_dict[f'male_total'] + stats_dict[f'female_total'] + stats_dict[f'org_total']
-
                 if emotion_name in RELEVANT_EMOTIONS and stats_dict[f'{category}_total'] > 0:
-                    stats_dict[emotion_category_name] = stats_dict[f'{emotion_category_name}_count']/divider
+                    stats_dict[emotion_category_name] = stats_dict[f'{emotion_category_name}_count']/stats_dict[f'{category}_total']
         else:
             if emotion_name in RELEVANT_EMOTIONS and stats_dict['total'] > 0:
                 stats_dict[emotion_name] = stats_dict[f'{emotion_name}_count']/stats_dict['total']
@@ -384,10 +379,8 @@ def main(
 
             if args.per_tweet:
                 output_filename = f"{file_path}/{lang}-{path_list[0]}-{path_list[1]}-per-tweet.csv"
-            elif args.per_category == 'over-category':
-                output_filename = f"{file_path}/{lang}-{path_list[0]}-{path_list[1]}-per-category-over-category.csv"
-            elif args.per_category == 'over-total':
-                output_filename = f"{file_path}/{lang}-{path_list[0]}-{path_list[1]}-per-category-over-total.csv"
+            elif args.per_category:
+                output_filename = f"{file_path}/{lang}-{path_list[0]}-{path_list[1]}-per-category.csv"
             else:
                 output_filename = f"{file_path}/{lang}-{path_list[0]}-{path_list[1]}.csv"
 
@@ -481,7 +474,12 @@ def standardize(
                             func='standardize'
                             )
                     )
-            stats_filename = f"{stats_path}/{varname}.stats.xml"
+            if args.per_category == 'over-category':
+                stats_filename = f"{stats_path}/{varname}-over-category.stats.xml"
+            elif args.per_category == 'over-total':
+                stats_filename = f"{stats_path}/{varname}-over-total.stats.xml"
+            else:
+                stats_filename = f"{stats_path}/{varname}.stats.xml"
 
             stats_output = fu.output_writer(
                 path=stats_filename,
@@ -491,7 +489,12 @@ def standardize(
 
             file_path = f"{args.output_dir_path}/standardize"
             Path(file_path).mkdir(parents=True, exist_ok=True)
-            output_filename = f"{file_path}/{basename}-standardized.csv"
+            if args.per_category == 'over-category':
+                output_filename = f"{file_path}/{basename}-over-category-standardized.csv"
+            elif args.per_category == 'over-total':
+                output_filename = f"{file_path}/{basename}-over-total-standardized.csv"
+            else:
+                output_filename = f"{file_path}/{basename}-standardized.csv"
 
             output = fu.output_writer(
                 path=output_filename,
