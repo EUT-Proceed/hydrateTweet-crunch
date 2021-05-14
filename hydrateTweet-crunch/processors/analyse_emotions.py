@@ -568,7 +568,7 @@ def calculate_means(
                         emotion_category_name = f"{category}_{emotion_name}"
                         if args.per_category == 'over-category':
                             stats_dict[f"{emotion_category_name}_mean"] += float(line[emotion_category_name])
-                        else: 
+                        else:
                             stats_dict[f"{emotion_name}_mean"] += float(line[emotion_category_name])
                 else:
                     stats_dict[f"{emotion_name}_mean"] += float(line[emotion_name])
@@ -577,13 +577,14 @@ def calculate_means(
             emotion_name = getEmotionName(emotion)
             if emotion_name in RELEVANT_EMOTIONS:
                 if args.per_category:
+                    if args.per_category == 'over-total':
+                        stats_dict[f"{emotion_name}_mean"] /= stats_dict["days"]
                     for category in ['male', 'female', 'org']:
                         emotion_category_name = f"{category}_{emotion_name}"
                         if args.per_category == 'over-category':
                             stats_dict[f"{emotion_category_name}_mean"] /= stats_dict["days"]
                             stats['results'][f"{emotion_category_name}_mean"] = stats_dict[f"{emotion_category_name}_mean"]
                         else:
-                            stats_dict[f"{emotion_name}_mean"] /= stats_dict["days"]
                             stats['results'][f"{emotion_category_name}_mean"] = stats_dict[f"{emotion_name}_mean"]
                 else:
                     stats_dict[f"{emotion_name}_mean"] /= stats_dict["days"]
@@ -604,30 +605,35 @@ def calculate_stdvs(
             emotion_name = getEmotionName(emotion)
             if emotion_name in RELEVANT_EMOTIONS:
                 if args.per_category:
+                    emotion_value_over_total = 0
                     for category in ['male', 'female', 'org']:
                         emotion_category_name = f"{category}_{emotion_name}"
                         emotion_value = float(line[emotion_category_name])
                         if args.per_category == 'over-category':
                             mean = stats_dict[f"{emotion_category_name}_mean"]
-                            stats_dict[f"{emotion_category_name}_stdv"] += pow(emotion_value - mean, 2)
+                            stats_dict[f"{emotion_category_name}_stdv"] += (emotion_value - mean)**2
                         else:
-                            mean = stats_dict[f"{emotion_name}_mean"]
-                            stats_dict[f"{emotion_name}_stdv"] += pow(emotion_value - mean, 2) 
+                            emotion_value_over_total += emotion_value
+                    if args.per_category == 'over-total':
+                        mean = stats_dict[f"{emotion_name}_mean"]
+                        stats_dict[f"{emotion_name}_stdv"] += (emotion_value_over_total - mean)**2
                 else:
                     mean = stats_dict[f"{emotion_name}_mean"]
                     emotion_value = float(line[emotion_name])
-                    stats_dict[f"{emotion_name}_stdv"] += pow(emotion_value - mean, 2)
+                    stats_dict[f"{emotion_name}_stdv"] += (emotion_value - mean)**2
 
     for emotion in Emotions:
         emotion_name = getEmotionName(emotion)
         if emotion_name in RELEVANT_EMOTIONS:
             if args.per_category:
+                if args.per_category == 'over-total':
+                    stats_dict[f"{emotion_name}_stdv"] = math.sqrt(stats_dict[f"{emotion_name}_stdv"] / stats_dict["days"])
                 for category in ['male', 'female', 'org']:
                     emotion_category_name = f"{category}_{emotion_name}"
                     if args.per_category == 'over-category':
                         stats['results'][f"{emotion_category_name}_stdv"] = stats_dict[f"{emotion_category_name}_stdv"] = math.sqrt(stats_dict[f"{emotion_category_name}_stdv"] / stats_dict["days"])
                     else:
-                        stats['results'][f"{emotion_category_name}_stdv"] = stats_dict[f"{emotion_name}_stdv"] = math.sqrt(stats_dict[f"{emotion_name}_stdv"] / stats_dict["days"])
+                        stats['results'][f"{emotion_category_name}_stdv"] = stats_dict[f"{emotion_name}_stdv"]
             else:
                 stats['results'][f"{emotion_name}_stdv"] = stats_dict[f"{emotion_name}_stdv"] = math.sqrt(stats_dict[f"{emotion_name}_stdv"] / stats_dict["days"])
 
