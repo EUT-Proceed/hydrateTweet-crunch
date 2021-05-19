@@ -37,7 +37,7 @@ def configure_subparsers(subparsers):
         type=str,
         default='week',
         choices={'week'},
-        help='The number of days that will be used to aggregate tweets together'
+        help='The number of days that will be used to aggregate tweets together [default: week]'
     )
 
     parser.set_defaults(func=main, which='aggregate_tweets')
