@@ -207,6 +207,7 @@ def get_valid_users(args: argparse.Namespace,
             json_file = f"{args.output_dir_path}/analyse-users/{lang}-users.json{compression}"
             if os.path.exists(json_file):
                 json_reader = fu.open_jsonobjects_file(json_file)
+                valid_users = set()
                 for user in json_reader:
                     valid_users.add(user["id_str"])
                 return valid_users
@@ -591,9 +592,9 @@ def calculate_stdvs(
         for emotion in Emotions:
             emotion_name = getEmotionName(emotion)
             if emotion_name in RELEVANT_EMOTIONS:
+                mean = stats_dict[f"{emotion_name}_mean"]
                 if args.filter_users == 'per-category':
                     emotion_value_over_total = 0
-                    mean = stats_dict[f"{emotion_name}_mean"]
                     for category in ['male', 'female', 'org']:
                         emotion_category_name = f"{category}_{emotion_name}"
                         emotion_value = float(line[emotion_category_name])

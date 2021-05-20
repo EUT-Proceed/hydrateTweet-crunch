@@ -6,5 +6,6 @@ from . import (
     infer_users,
     download_images,
     aggregate_tweets,
-    filter_inferred
+    filter_inferred,
+    calc_words_frequency
 )
