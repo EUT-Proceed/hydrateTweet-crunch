@@ -42,6 +42,7 @@ stats_template = '''
 
 RELEVANT_EMOTIONS = ["positive", "negative", "anger", "anticipation", "disgust", "fear", "joy", "sadness", "surprise", "trust"]
 
+
 def process_lines(
         dump: Iterable[list],
         stats: Mapping,
@@ -88,7 +89,7 @@ def process_tweet(
         # Check if the list is empty
         if emotions:
             stats['performance']['input']['words'] += 1
-            words_dict['total'] += 1
+            words_dict['words'] += 1
 
         for emotion in emotions:
             emotion = getEmotionName(emotion)
@@ -98,10 +99,12 @@ def process_tweet(
                 else:
                     words_dict[emotion][word] += 1
 
+    words_dict['tweets'] += 1
     stats['performance']['input']['tweets'] += 1
     nobjs = stats['performance']['input']['tweets']
     if (nobjs-1) % NTWEET == 0:
         utils.dot()
+
 
 def get_first_n_words(
     stats: Mapping,
@@ -113,8 +116,14 @@ def get_first_n_words(
             n_words = args.n_words if len(sorted_words) >= args.n_words else len(sorted_words)
             for i in range(n_words):
                 word = sorted_words[i]
-                yield {'word': word, 'occurrences': words[word], 'emotion': emotion}
-            
+                yield {
+                    'word': word, 
+                    'occurrences': words[word], 
+                    'occ/words': words[word]/words_dict['words'], 
+                    'occ/tweets': words[word]/words_dict['tweets'], 
+                    'emotion': emotion
+                    }
+
 
 def configure_subparsers(subparsers):
     """Configure a new subparser ."""
@@ -131,6 +140,7 @@ def configure_subparsers(subparsers):
     )
 
     parser.set_defaults(func=main, which='calc_words_frequency')
+
 
 def main(
         dump: Iterable[list],
@@ -158,7 +168,8 @@ def main(
     for emotion in RELEVANT_EMOTIONS:
         words_dict[emotion] = {}
 
-    words_dict['total'] = 0
+    words_dict['words'] = 0
+    words_dict['tweets'] = 0
 
     stats['performance']['start_time'] = datetime.datetime.utcnow()
 
@@ -211,7 +222,7 @@ def main(
                 mode='wt'
             )
     
-    fieldnames = ['word', 'occurrences', 'emotion']
+    fieldnames = ['word', 'occurrences', 'occ/words', 'occ/tweets', 'emotion']
 
     writer = csv.DictWriter(output, fieldnames=fieldnames)
     writer.writeheader()
