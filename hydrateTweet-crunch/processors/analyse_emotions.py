@@ -202,14 +202,13 @@ def get_valid_users(args: argparse.Namespace,
                 for inferred_user in csv_reader:
                     valid_users[inferred_user["id_str"]] = inferred_user["category"]
                 return valid_users
-    elif args.filter_users == 'per-category':
+    elif args.filter_users == 'per-tweet-number':
         for compression in ['', '.gz', '.7z', '.bz2']:
-            csv_file = f"{args.output_dir_path}/analyse-users/{lang}-users.csv{compression}"
-            if os.path.exists(csv_file):
-                csv_reader = csv.DictReader(fu.open_csv_file(csv_file))
-                valid_users = {}
-                for inferred_user in csv_reader:
-                    valid_users[inferred_user["id_str"]] = inferred_user["category"]
+            json_file = f"{args.output_dir_path}/analyse-users/{lang}-users.json{compression}"
+            if os.path.exists(json_file):
+                json_reader = fu.open_jsonobjects_file(json_file)
+                for user in json_reader:
+                    valid_users.add(user["id_str"])
                 return valid_users
     return None
 
@@ -219,7 +218,7 @@ def process_tweet(
     stats: Mapping,
     users_dict:dict,
     stats_dict:dict,
-    valid_user:dict,
+    valid_user,
     args: argparse.Namespace):
     """Analyze a tweet based on the specifics
     """
@@ -285,7 +284,7 @@ def configure_subparsers(subparsers):
     )
     parser.add_argument(
         '--filter-users', '-f',
-        choices={'per-category', 'per-tweets'},
+        choices={'per-category', 'per-tweet-number'},
         required=False,
         default=None,
         help='Filter users in three main categories (male, female, org) or based on their number of tweets over the dataset [default: None]',
@@ -374,7 +373,7 @@ def main(
             stats_filename = f"{stats_path}/{varname}-per-tweet.stats.xml"
         elif args.filter_users == 'per-category':
             stats_filename = f"{stats_path}/{varname}-per-category.stats.xml"
-        elif args.filter_users == 'per-tweets':
+        elif args.filter_users == 'per-tweet-number':
             stats_filename = f"{stats_path}/{varname}-filtered.stats.xml"
         else:
             stats_filename = f"{stats_path}/{varname}.stats.xml"
@@ -393,7 +392,7 @@ def main(
                 output_filename = f"{file_path}/{lang}-{path_list[0]}-{path_list[1]}-per-tweet.csv"
             elif args.filter_users == 'per-category':
                 output_filename = f"{file_path}/{lang}-{path_list[0]}-{path_list[1]}-per-category.csv"
-            elif args.filter_users == 'per-tweets':
+            elif args.filter_users == 'per-tweet-number':
                 output_filename = f"{file_path}/{lang}-{path_list[0]}-{path_list[1]}-filtered.csv"
             else:
                 output_filename = f"{file_path}/{lang}-{path_list[0]}-{path_list[1]}.csv"
