@@ -539,7 +539,7 @@ def standardize(
         stats['performance']['end_time'] = datetime.datetime.utcnow()
         with stats_output:
             dumper.render_template(
-                stats_template_finalize_per_category if not args.filter_users == 'per-category' else stats_template_finalize,
+                stats_template_finalize_per_category if args.filter_users == 'per-category' else stats_template_finalize,
                 stats_output,
                 stats=stats,
             )
