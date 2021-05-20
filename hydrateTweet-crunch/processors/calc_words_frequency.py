@@ -181,7 +181,7 @@ def main(
     )
 
     path_list = re.split('-|\.', basename)
-    date = f"{path_list[3]}-{path_list[4]}-{path_list[2]}"
+    date = f"{path_list[2]}-{path_list[3]}-{path_list[4]}"
 
     if not args.dry_run:
         stats_path = f"{args.output_dir_path}/words-frequency/stats/{lang}"

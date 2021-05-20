@@ -360,7 +360,7 @@ def main(
     )
 
     path_list = re.split('-|\.', basename)
-    stats_dict['date'] = f"{path_list[3]}/{path_list[4]}/{path_list[2]}"
+    stats_dict['date'] = f"{path_list[2]}/{path_list[3]}/{path_list[4]}"
 
     if not args.dry_run:
         stats_path = f"{args.output_dir_path}/analyse-emotions/stats/{lang}"
