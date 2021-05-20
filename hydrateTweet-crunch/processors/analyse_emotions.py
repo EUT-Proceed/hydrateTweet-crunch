@@ -571,6 +571,7 @@ def calculate_means(
             if emotion_name in RELEVANT_EMOTIONS:
                 stats_dict[f"{emotion_name}_mean"] /= stats_dict["days"]
                 if args.filter_users == 'per-category':
+                    stats_dict[f"{emotion_name}_mean"] /= 3
                     for category in ['male', 'female', 'org']:
                         emotion_category_name = f"{category}_{emotion_name}"
                         stats['results'][f"{emotion_category_name}_mean"] = stats_dict[f"{emotion_name}_mean"]
