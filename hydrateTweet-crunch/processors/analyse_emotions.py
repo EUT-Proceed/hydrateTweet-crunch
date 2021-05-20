@@ -164,7 +164,7 @@ def process_lines(
     lang = first['lang']
     if initEmotionLexicon(lang=lang):
         valid_users=None
-        if args.per_category:
+        if args.filter_users:
             valid_users = get_valid_users(args, lang)
             if not valid_users:
                 utils.log('The file of valid users could not be found')
@@ -192,15 +192,25 @@ def process_lines(
 
 
 def get_valid_users(args: argparse.Namespace,
-                       lang: str):
-    for compression in ['', '.gz', '.7z', '.bz2']:
-        csv_file = f"{args.output_dir_path}/filter-inferred/{lang}-inferred-users.csv{compression}"
-        if os.path.exists(csv_file):
-            csv_reader = csv.DictReader(fu.open_csv_file(csv_file))
-            valid_users = {}
-            for inferred_user in csv_reader:
-                valid_users[inferred_user["id_str"]] = inferred_user["category"]
-            return valid_users
+                    lang: str):
+    if args.filter_users == 'per-category':
+        for compression in ['', '.gz', '.7z', '.bz2']:
+            csv_file = f"{args.output_dir_path}/filter-inferred/{lang}-inferred-users.csv{compression}"
+            if os.path.exists(csv_file):
+                csv_reader = csv.DictReader(fu.open_csv_file(csv_file))
+                valid_users = {}
+                for inferred_user in csv_reader:
+                    valid_users[inferred_user["id_str"]] = inferred_user["category"]
+                return valid_users
+    elif args.filter_users == 'per-category':
+        for compression in ['', '.gz', '.7z', '.bz2']:
+            csv_file = f"{args.output_dir_path}/analyse-users/{lang}-users.csv{compression}"
+            if os.path.exists(csv_file):
+                csv_reader = csv.DictReader(fu.open_csv_file(csv_file))
+                valid_users = {}
+                for inferred_user in csv_reader:
+                    valid_users[inferred_user["id_str"]] = inferred_user["category"]
+                return valid_users
     return None
 
 
@@ -216,9 +226,9 @@ def process_tweet(
 
     full_text = tweet['full_text']
     user_id = str(tweet['user']['id'])
-    if args.per_category and not user_id in valid_user:
+    if args.filter_users and not user_id in valid_user:
         return
-    elif args.per_category: 
+    elif args.filter_users == 'per-category': 
         category = f'{valid_user[user_id]}_'
     else:
         category = ''
@@ -274,11 +284,11 @@ def configure_subparsers(subparsers):
         help='Consider each tweet indipendently',
     )
     parser.add_argument(
-        '--per-category', '-c',
-        choices={'over-category', 'over-total'},
+        '--filter-users', '-f',
+        choices={'per-category', 'per-tweets'},
         required=False,
         default=None,
-        help='Calculate statistics w.r.t three main categories (male, female, org) over the specific category or over the total [default: None]',
+        help='Filter users in three main categories (male, female, org) or based on their number of tweets over the dataset [default: None]',
     )
     parser.add_argument(
         '--standardize', '-s',
@@ -294,7 +304,7 @@ def calculate_emotions(
     ):
     for emotion in Emotions:
         emotion_name = getEmotionName(emotion)
-        if args.per_category:
+        if args.filter_users == 'per-category':
             for category in ['male', 'female', 'org']:
                 emotion_category_name = f"{category}_{emotion_name}"
                 if emotion_name in RELEVANT_EMOTIONS and stats_dict[f'{category}_total'] > 0:
@@ -362,8 +372,10 @@ def main(
                    )
         if args.per_tweet:
             stats_filename = f"{stats_path}/{varname}-per-tweet.stats.xml"
-        elif args.per_category:
+        elif args.filter_users == 'per-category':
             stats_filename = f"{stats_path}/{varname}-per-category.stats.xml"
+        elif args.filter_users == 'per-tweets':
+            stats_filename = f"{stats_path}/{varname}-filtered.stats.xml"
         else:
             stats_filename = f"{stats_path}/{varname}.stats.xml"
 
@@ -379,8 +391,10 @@ def main(
 
             if args.per_tweet:
                 output_filename = f"{file_path}/{lang}-{path_list[0]}-{path_list[1]}-per-tweet.csv"
-            elif args.per_category:
+            elif args.filter_users == 'per-category':
                 output_filename = f"{file_path}/{lang}-{path_list[0]}-{path_list[1]}-per-category.csv"
+            elif args.filter_users == 'per-tweets':
+                output_filename = f"{file_path}/{lang}-{path_list[0]}-{path_list[1]}-filtered.csv"
             else:
                 output_filename = f"{file_path}/{lang}-{path_list[0]}-{path_list[1]}.csv"
 
@@ -447,14 +461,8 @@ def standardize(
         for emotion in Emotions:
             emotion_name = getEmotionName(emotion)
             if emotion_name in RELEVANT_EMOTIONS:
-                if args.per_category and args.per_category == 'over-category':
-                    for category in ['male', 'female', 'org']:
-                        emotion_category_name = f"{category}_{emotion_name}"
-                        stats_dict[f"{emotion_category_name}_mean"] = 0
-                        stats_dict[f"{emotion_category_name}_stdv"] = 0
-                else:
-                    stats_dict[f"{emotion_name}_mean"] = 0
-                    stats_dict[f"{emotion_name}_stdv"] = 0
+                stats_dict[f"{emotion_name}_mean"] = 0
+                stats_dict[f"{emotion_name}_stdv"] = 0
 
         # Calculate mean for every emotions
         calculate_means(stats_dict, input_file_path, stats, args)
@@ -474,12 +482,7 @@ def standardize(
                             func='standardize'
                             )
                     )
-            if args.per_category == 'over-category':
-                stats_filename = f"{stats_path}/{varname}-over-category.stats.xml"
-            elif args.per_category == 'over-total':
-                stats_filename = f"{stats_path}/{varname}-over-total.stats.xml"
-            else:
-                stats_filename = f"{stats_path}/{varname}.stats.xml"
+            stats_filename = f"{stats_path}/{varname}.stats.xml"
 
             stats_output = fu.output_writer(
                 path=stats_filename,
@@ -489,12 +492,7 @@ def standardize(
 
             file_path = f"{args.output_dir_path}/standardize"
             Path(file_path).mkdir(parents=True, exist_ok=True)
-            if args.per_category == 'over-category':
-                output_filename = f"{file_path}/{basename}-over-category-standardized.csv"
-            elif args.per_category == 'over-total':
-                output_filename = f"{file_path}/{basename}-over-total-standardized.csv"
-            else:
-                output_filename = f"{file_path}/{basename}-standardized.csv"
+            output_filename = f"{file_path}/{basename}-standardized.csv"
 
             output = fu.output_writer(
                 path=output_filename,
@@ -515,17 +513,12 @@ def standardize(
             for emotion in Emotions:
                 emotion_name = getEmotionName(emotion)
                 if emotion_name in RELEVANT_EMOTIONS:
-                    if args.per_category:
+                    if args.filter_users == 'per-category':
                         for category in ['male', 'female', 'org']:
                             emotion_category_name = f"{category}_{emotion_name}"
                             emotion_value = float(line[emotion_category_name])
-                            if args.per_category == 'over-category':
-                                mean = stats_dict[f"{emotion_category_name}_mean"]
-                                stdv = stats_dict[f"{emotion_category_name}_stdv"]
-                            else:
-                                mean = stats_dict[f"{emotion_name}_mean"]
-                                stdv = stats_dict[f"{emotion_name}_stdv"]
-
+                            mean = stats_dict[f"{emotion_name}_mean"]
+                            stdv = stats_dict[f"{emotion_name}_stdv"]
                             try:
                                 csv_row[emotion_category_name] = (emotion_value - mean) / stdv
                             except:
@@ -546,7 +539,7 @@ def standardize(
         stats['performance']['end_time'] = datetime.datetime.utcnow()
         with stats_output:
             dumper.render_template(
-                stats_template_finalize if not args.per_category else stats_template_finalize_per_category,
+                stats_template_finalize_per_category if not args.filter_users == 'per-category' else stats_template_finalize,
                 stats_output,
                 stats=stats,
             )
@@ -566,31 +559,22 @@ def calculate_means(
         for emotion in Emotions:
             emotion_name = getEmotionName(emotion)
             if emotion_name in RELEVANT_EMOTIONS:
-                if args.per_category:
+                if args.filter_users == 'per_category':
                     for category in ['male', 'female', 'org']:
                         emotion_category_name = f"{category}_{emotion_name}"
-                        if args.per_category == 'over-category':
-                            stats_dict[f"{emotion_category_name}_mean"] += float(line[emotion_category_name])
-                        else:
-                            stats_dict[f"{emotion_name}_mean"] += float(line[emotion_category_name])
+                        stats_dict[f"{emotion_name}_mean"] += float(line[emotion_category_name])
                 else:
                     stats_dict[f"{emotion_name}_mean"] += float(line[emotion_name])
     
     for emotion in Emotions:
             emotion_name = getEmotionName(emotion)
             if emotion_name in RELEVANT_EMOTIONS:
-                if args.per_category:
-                    if args.per_category == 'over-total':
-                        stats_dict[f"{emotion_name}_mean"] /= stats_dict["days"]
+                stats_dict[f"{emotion_name}_mean"] /= stats_dict["days"]
+                if args.filter_users == 'per-category':
                     for category in ['male', 'female', 'org']:
                         emotion_category_name = f"{category}_{emotion_name}"
-                        if args.per_category == 'over-category':
-                            stats_dict[f"{emotion_category_name}_mean"] /= stats_dict["days"]
-                            stats['results'][f"{emotion_category_name}_mean"] = stats_dict[f"{emotion_category_name}_mean"]
-                        else:
-                            stats['results'][f"{emotion_category_name}_mean"] = stats_dict[f"{emotion_name}_mean"]
+                        stats['results'][f"{emotion_category_name}_mean"] = stats_dict[f"{emotion_name}_mean"]
                 else:
-                    stats_dict[f"{emotion_name}_mean"] /= stats_dict["days"]
                     stats['results'][f"{emotion_name}_mean"] = stats_dict[f"{emotion_name}_mean"]
     
     csv_file.close()
@@ -607,36 +591,26 @@ def calculate_stdvs(
         for emotion in Emotions:
             emotion_name = getEmotionName(emotion)
             if emotion_name in RELEVANT_EMOTIONS:
-                if args.per_category:
+                if args.filter_users == 'per-category':
                     emotion_value_over_total = 0
+                    mean = stats_dict[f"{emotion_name}_mean"]
                     for category in ['male', 'female', 'org']:
                         emotion_category_name = f"{category}_{emotion_name}"
                         emotion_value = float(line[emotion_category_name])
-                        if args.per_category == 'over-category':
-                            mean = stats_dict[f"{emotion_category_name}_mean"]
-                            stats_dict[f"{emotion_category_name}_stdv"] += (emotion_value - mean)**2
-                        else:
-                            emotion_value_over_total += emotion_value
-                    if args.per_category == 'over-total':
-                        mean = stats_dict[f"{emotion_name}_mean"]
-                        stats_dict[f"{emotion_name}_stdv"] += (emotion_value_over_total - mean)**2
+                        emotion_value_over_total += emotion_value
+                    stats_dict[f"{emotion_name}_stdv"] += (emotion_value_over_total - mean)**2
                 else:
-                    mean = stats_dict[f"{emotion_name}_mean"]
                     emotion_value = float(line[emotion_name])
                     stats_dict[f"{emotion_name}_stdv"] += (emotion_value - mean)**2
 
     for emotion in Emotions:
         emotion_name = getEmotionName(emotion)
         if emotion_name in RELEVANT_EMOTIONS:
-            if args.per_category:
-                if args.per_category == 'over-total':
-                    stats_dict[f"{emotion_name}_stdv"] = math.sqrt(stats_dict[f"{emotion_name}_stdv"] / stats_dict["days"])
+            if args.filter_users == 'per-category':
+                stats_dict[f"{emotion_name}_stdv"] = math.sqrt(stats_dict[f"{emotion_name}_stdv"] / stats_dict["days"])
                 for category in ['male', 'female', 'org']:
                     emotion_category_name = f"{category}_{emotion_name}"
-                    if args.per_category == 'over-category':
-                        stats['results'][f"{emotion_category_name}_stdv"] = stats_dict[f"{emotion_category_name}_stdv"] = math.sqrt(stats_dict[f"{emotion_category_name}_stdv"] / stats_dict["days"])
-                    else:
-                        stats['results'][f"{emotion_category_name}_stdv"] = stats_dict[f"{emotion_name}_stdv"]
+                    stats['results'][f"{emotion_category_name}_stdv"] = stats_dict[f"{emotion_name}_stdv"]
             else:
                 stats['results'][f"{emotion_name}_stdv"] = stats_dict[f"{emotion_name}_stdv"] = math.sqrt(stats_dict[f"{emotion_name}_stdv"] / stats_dict["days"])
 
@@ -644,7 +618,7 @@ def calculate_stdvs(
 
 
 def get_main_fieldnames(args: argparse.Namespace) -> Iterable[str]:
-    if args.per_category:
+    if args.filter_users == 'per-category':
         return [
             "date",
             "male_positive", 
@@ -739,7 +713,7 @@ def get_main_fieldnames(args: argparse.Namespace) -> Iterable[str]:
 
 
 def get_standardize_stats(args: argparse.Namespace) -> dict:
-    if args.per_category:
+    if args.filter_users == 'per-category':
         return {
             'performance': {
                 'start_time': None,
@@ -843,7 +817,7 @@ def get_standardize_stats(args: argparse.Namespace) -> dict:
 
 
 def get_standardize_fieldnames(args: argparse.Namespace) -> Iterable[str]:
-    if args.per_category:
+    if args.filter_users == 'per-category':
         return [
             "date",
             "male_positive", 
