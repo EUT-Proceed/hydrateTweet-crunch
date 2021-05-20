@@ -559,7 +559,7 @@ def calculate_means(
         for emotion in Emotions:
             emotion_name = getEmotionName(emotion)
             if emotion_name in RELEVANT_EMOTIONS:
-                if args.filter_users == 'per_category':
+                if args.filter_users == 'per-category':
                     for category in ['male', 'female', 'org']:
                         emotion_category_name = f"{category}_{emotion_name}"
                         stats_dict[f"{emotion_name}_mean"] += float(line[emotion_category_name])
