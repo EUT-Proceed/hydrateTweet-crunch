@@ -1,5 +1,5 @@
 """
-Given the number of days, it aggregates in a single file tweets of the same pool of days, year and language.
+Given an aggregation method, it aggregates in a single file tweets of the same pool of days, year and language.
 
 The output format is json.
 """
@@ -37,7 +37,7 @@ def configure_subparsers(subparsers):
         type=str,
         default='week',
         choices={'week'},
-        help='The number of days that will be used to aggregate tweets together [default: week]'
+        help='The method that will be used to aggregate tweets together [default: week]'
     )
 
     parser.set_defaults(func=main, which='aggregate_tweets')

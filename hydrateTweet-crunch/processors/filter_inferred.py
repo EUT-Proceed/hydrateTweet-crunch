@@ -1,6 +1,6 @@
 """
 Filter the .csv file obtained from infer_user processor, keeping only the inferred 
-users which match specific characteristics.
+users who match specific characteristics.
 
 The output format is csv.
 """
@@ -80,14 +80,14 @@ def configure_subparsers(subparsers):
         type=float,
         required=False,
         default=0.95,
-        help='The minimum gender accuracy who a user should (at least) have in order to be considered [default: 0.95].',
+        help='The minimum gender accuracy a user should (at least) have in order to be considered [default: 0.95].',
     )
     parser.add_argument(
         '--org-acc',
         type=float,
         required=False,
         default=0.95,
-        help='The minimum organization accuracy which an organization should (at least) have in order to be considered [default: 0.95].',
+        help='The minimum organization accuracy an organization should (at least) have in order to be considered [default: 0.95].',
     )
 
     parser.set_defaults(func=main, which='filter_inferred')

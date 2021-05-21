@@ -1,5 +1,5 @@
 """
-Extract specific field from tweets and sort them by language.
+Extract specific fields from tweets and sort them by language.
 
 The output format is json.
 """
@@ -62,6 +62,12 @@ def process_lines(
             stats['performance']['input']['retweet'] += 1
 
 
+def close_all_descriptors(desr_dict:dict):
+    for lang in desr_dict:
+        desr_dict[lang].close()
+    utils.log('descriptors all closed')
+
+
 def configure_subparsers(subparsers):
     """Configure a new subparser ."""
     parser = subparsers.add_parser(
@@ -70,12 +76,6 @@ def configure_subparsers(subparsers):
     )
 
     parser.set_defaults(func=main, which='lang_sort')
-
-
-def close_all_descriptors(desr_dict:dict):
-    for lang in desr_dict:
-        desr_dict[lang].close()
-    utils.log('descriptors all closed')
 
 
 def main(

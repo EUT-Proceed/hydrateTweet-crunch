@@ -121,7 +121,7 @@ def configure_subparsers(subparsers):
         type=int,
         required=False,
         default=1,
-        help='The minimum number of tweets that a user should have in order to be analysed [default: 1].',
+        help='The minimum number of tweets that a user should have in order to be saved in the output file [default: 1].',
     )
 
     parser.set_defaults(func=main, finalize=write_users, which='analyse_users')

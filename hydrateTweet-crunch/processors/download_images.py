@@ -1,14 +1,11 @@
 """
-Infer gender, age and if it's an organization given a user.
+Given a json file of users, it downloads the corresponding image for each line in the format specified by m3inference.
 
-The output format is csv.
 """
 
 import os
 import shutil
 import io
-import csv
-import json
 import re
 import argparse
 import datetime
@@ -67,8 +64,8 @@ def process_lines(
         args:argparse.Namespace,
         cache_dir: str
         ) -> Iterator[list]:
-    """It checks for each line (user) if the number of tweets is above a certain minimum and if
-       it is the case, it downloads the image
+    """It checks for each line (user) if the number of tweets is above a certain minimum and, if
+       that's the case, it downloads the image
     """
     
     for user in dump:
@@ -88,20 +85,20 @@ def configure_subparsers(subparsers):
     """Configure a new subparser ."""
     parser = subparsers.add_parser(
         'download-images',
-        help="Given a json file, it downloads the corresponding image for each lines in the format specified by m3inference. Used to download images in parallel",
+        help="Given a json file of users, it downloads the corresponding image for each line in the format specified by m3inference.",
     )
     parser.add_argument(
         '--min-tweets',
         type=int,
         required=False,
         default=2,
-        help='The minimum number of tweets that a user should have in order to be analysed [default: 2].',
+        help='The minimum number of tweets that a user should have in order to be processed [default: 2].',
     )
     parser.add_argument(
         '--cache-dir',
         type=str,
         required=True,
-        help='The name of the cache directory that will be used later on by m3inference: parameter is appended to \"twitter_cache_\".'
+        help='The name of the cache directory used by m3inference: the argument is appended to \"twitter_cache_\".'
     )
 
     parser.set_defaults(func=main, which='download_images')

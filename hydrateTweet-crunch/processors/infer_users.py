@@ -1,5 +1,5 @@
 """
-Infer gender, age and if it's an organization given a user.
+Given a json file of users, infer gender, age and if it's the profile of an organization using m3inference
 
 The output format is csv.
 """
@@ -115,21 +115,26 @@ def configure_subparsers(subparsers):
     """Configure a new subparser ."""
     parser = subparsers.add_parser(
         'infer-users',
-        help="Given json file of users it infers gender, age and if it's an organization using m3inference",
+        help="Given a json file of users, infer gender, age and if it's the profile of an organization using m3inference",
     )
     parser.add_argument(
         '--min-tweets',
         type=int,
         required=False,
         default=2,
-        help='The minimum number of tweets that a user should have in order to be analysed [default: 2].',
+        help='The minimum number of tweets that a user should have in order to be processed [default: 2].',
     )
     parser.add_argument(
         '--cache-dir',
         type=str,
         required=False,
         default=str(os.getpid()),
-        help='The name of the cache directory used by m3inference: parameter is appended to \"twitter_cache_\" [default: twitter_cache_PID].'
+        help='The name of the cache directory used by m3inference: the argument is appended to \"twitter_cache_\" [default: twitter_cache_PID].'
+    )
+    parser.add_argument(
+        '--delete', '-d',
+        action='store_true',
+        help='Delete the cache directory [default: None].',
     )
 
     parser.set_defaults(func=main, which='infer_users')
@@ -279,8 +284,9 @@ def main(
     
     stats_output.close()
 
-    try:
-        utils.log("Deleting cache directory")
-        shutil.rmtree(cache_dir)
-    except OSError as e:
-        utils.log(f"Error: {e.filename} - {e.strerror}.")
+    if args.delete:
+        try:
+            utils.log("Deleting cache directory")
+            shutil.rmtree(cache_dir)
+        except OSError as e:
+            utils.log(f"Error: {e.filename} - {e.strerror}.")

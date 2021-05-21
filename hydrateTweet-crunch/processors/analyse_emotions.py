@@ -1,5 +1,5 @@
 """
-Analyse the text from tweets and generate a file which contains statistics w.r.t emotions.
+Analyse text from tweets and generate a file which contains statistics w.r.t emotions.
 
 The output format is csv.
 """
@@ -370,14 +370,18 @@ def main(
                            func='analyse-emotions'
                            )
                    )
-        if args.per_tweet:
-            stats_filename = f"{stats_path}/{varname}-per-tweet.stats.xml"
-        elif args.filter_users == 'per-category':
-            stats_filename = f"{stats_path}/{varname}-per-category.stats.xml"
+        
+        stats_filename = f"{stats_path}/{varname}"
+
+        if args.filter_users == 'per-category':
+            stats_filename = f"{stats_filename}-per-category"
         elif args.filter_users == 'per-tweet-number':
-            stats_filename = f"{stats_path}/{varname}-filtered.stats.xml"
+            stats_filename = f"{stats_filename}-filtered"
+
+        if args.per_tweet:
+            stats_filename = f"{stats_filename}-per-tweet.stats.xml"
         else:
-            stats_filename = f"{stats_path}/{varname}.stats.xml"
+            stats_filename = f"{stats_filename}.stats.xml"
 
         stats_output = fu.output_writer(
             path=stats_filename,
@@ -389,14 +393,18 @@ def main(
             file_path = f"{args.output_dir_path}/analyse-emotions"
             Path(file_path).mkdir(parents=True, exist_ok=True)
 
-            if args.per_tweet:
-                output_filename = f"{file_path}/{lang}-{path_list[0]}-{path_list[1]}-per-tweet.csv"
-            elif args.filter_users == 'per-category':
-                output_filename = f"{file_path}/{lang}-{path_list[0]}-{path_list[1]}-per-category.csv"
+            # create the file base name
+            output_filename = f"{file_path}/{lang}-{path_list[0]}-{path_list[1]}"
+
+            if args.filter_users == 'per-category':
+                output_filename = f"{output_filename}-per-category"
             elif args.filter_users == 'per-tweet-number':
-                output_filename = f"{file_path}/{lang}-{path_list[0]}-{path_list[1]}-filtered.csv"
+                output_filename = f"{output_filename}-filtered"
+
+            if args.per_tweet:
+                output_filename = f"{output_filename}-per-tweet.csv"
             else:
-                output_filename = f"{file_path}/{lang}-{path_list[0]}-{path_list[1]}.csv"
+                output_filename = f"{output_filename}.csv"
 
             #The header of the .csv will be added only if the file doesn't exist
             if not args.output_compression:

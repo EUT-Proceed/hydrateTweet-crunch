@@ -9,7 +9,7 @@ def get_args():
     """Parse command line arguments."""
     parser = argparse.ArgumentParser(
         prog='hydrateTweet-crunch',
-        description='Graph snapshot features extractor.',
+        description='Crunches the Tweets from the dataset and perform different kinds of operations.',
     )
     parser.add_argument(
         'files',
@@ -22,7 +22,7 @@ def get_args():
         'output_dir_path',
         metavar='OUTPUT_DIR',
         type=pathlib.Path,
-        help='XML output directory.',
+        help='Output directory.',
     )
     parser.add_argument(
         '--output-compression',
@@ -48,7 +48,6 @@ def get_args():
     processors.lang_sort.configure_subparsers(subparsers)
     processors.analyse_emotions.configure_subparsers(subparsers)
     processors.analyse_users.configure_subparsers(subparsers)
-    processors.standardize.configure_subparsers(subparsers)
     processors.infer_users.configure_subparsers(subparsers)
     processors.download_images.configure_subparsers(subparsers)
     processors.aggregate_tweets.configure_subparsers(subparsers)
