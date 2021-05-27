@@ -54,6 +54,7 @@ def get_args():
     processors.filter_inferred.configure_subparsers(subparsers)
     processors.calc_words_frequency.configure_subparsers(subparsers)
     processors.calc_locations_frequency.configure_subparsers(subparsers)
+    processors.geocode.configure_subparsers(subparsers)
 
     parsed_args = parser.parse_args()
     if 'func' not in parsed_args:

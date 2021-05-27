@@ -7,5 +7,6 @@ from . import (
     aggregate_tweets,
     filter_inferred,
     calc_words_frequency,
-    calc_locations_frequency
+    calc_locations_frequency,
+    geocode
 )
