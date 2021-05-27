@@ -6,5 +6,6 @@ from . import (
     download_images,
     aggregate_tweets,
     filter_inferred,
-    calc_words_frequency
+    calc_words_frequency,
+    calc_locations_frequency
 )

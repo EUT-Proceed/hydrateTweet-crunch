@@ -175,7 +175,6 @@ def main(
 
     output = open(os.devnull, 'wt')
     stats_output = open(os.devnull, 'wt')
-    addHeader = False
 
     # process the dump
     lang = process_lines(
