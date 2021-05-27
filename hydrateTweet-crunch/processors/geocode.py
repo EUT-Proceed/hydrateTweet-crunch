@@ -61,7 +61,10 @@ def process_lines(
             nobjs = stats['performance']['input']['locations']
             if (nobjs-1) % NLOCATIONS == 0:
                 utils.dot()
-            yield res.raw
+            raw = res.raw
+            raw['location'] = location
+            raw['occurrences'] = line['occurrences']
+            yield raw
         
         if count > args.requests:
             utils.log(f'Reached max number of requests ({args.request})')
