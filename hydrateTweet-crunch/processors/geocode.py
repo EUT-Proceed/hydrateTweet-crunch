@@ -27,7 +27,7 @@ from operator import itemgetter
 from pprint import pprint
 
 # print a dot each NTWEET tweets
-NLOCATIONS = 10000
+NLOCATIONS = 1000
 
 # templates
 stats_template = '''
@@ -47,7 +47,7 @@ def process_lines(
         dump: Iterable[list],
         stats: Mapping,
         geocoder,
-        args:argparse.Namespace) -> geopy.location.Location:
+        args:argparse.Namespace) -> dict:
     """Assign each revision to the snapshot or snapshots to which they
        belong.
     """
@@ -57,7 +57,9 @@ def process_lines(
     with concurrent.futures.ThreadPoolExecutor(max_workers=5) as executor:
         for line in csv_reader:
             location = line['location']
-            future_to_geocode[executor.submit(send_geocode_request, geocoder, location)] = location
+            occurrences = line['occurrences']
+            utils.log(f'request to geocode {location}...')
+            future_to_geocode[executor.submit(send_geocode_request, geocoder, location)] = (location, occurrences)
             sleep(1)
             count += 1
             
@@ -65,18 +67,20 @@ def process_lines(
                 utils.log(f'Reached max number of requests ({args.request})')
                 break
 
-        for future in concurrent.futures.as_completed(future_to_geocode):
-            location = future_to_geocode[future]
-            try:
-                res = future.result()
-            except Exception as exc:
-                print(f'{location} generated an exception: {exc}')
-            else:
-                if res:
-                    raw = res.raw
-                    raw['location'] = location
-                    raw['occurrences'] = line['occurrences']
-                    yield raw
+    utils.log('writing the results on the file...')
+
+    for future in concurrent.futures.as_completed(future_to_geocode):
+        location, occurrences = future_to_geocode[future]
+        try:
+            res = future.result()
+        except Exception as exc:
+            utils.log(f'{location} generated an exception: {exc}')
+        else:
+            if res:
+                raw = res.raw
+                raw['location'] = location
+                raw['occurrences'] = occurrences
+                yield raw
 
 
 def send_geocode_request(geocoder, location):
