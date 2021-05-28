@@ -13,6 +13,8 @@ import datetime
 import math
 from pathlib import Path
 import geopy
+import concurrent.futures
+from time import sleep
 
 from typing import Iterable, Iterator, Mapping, Counter
 
@@ -51,24 +53,34 @@ def process_lines(
     """
     count = 0
     csv_reader = csv.DictReader(dump)
-    for line in csv_reader:
-        location = line['location']
-        res = geocoder.geocode(location, addressdetails=True)
-        count += 1
+    future_to_geocode = {}
+    with concurrent.futures.ThreadPoolExecutor(max_workers=5) as executor:
+        for line in csv_reader:
+            location = line['location']
+            future_to_geocode[executor.submit(send_geocode_request, geocoder, location)] = location
+            sleep(1)
+            count += 1
+            
+            if count > args.requests:
+                utils.log(f'Reached max number of requests ({args.request})')
+                break
 
-        if res:
-            stats['performance']['input']['locations'] += 1
-            nobjs = stats['performance']['input']['locations']
-            if (nobjs-1) % NLOCATIONS == 0:
-                utils.dot()
-            raw = res.raw
-            raw['location'] = location
-            raw['occurrences'] = line['occurrences']
-            yield raw
-        
-        if count > args.requests:
-            utils.log(f'Reached max number of requests ({args.request})')
-            break
+        for future in concurrent.futures.as_completed(future_to_geocode):
+            location = future_to_geocode[future]
+            try:
+                res = future.result()
+            except Exception as exc:
+                print(f'{location} generated an exception: {exc}')
+            else:
+                if res:
+                    raw = res.raw
+                    raw['location'] = location
+                    raw['occurrences'] = line['occurrences']
+                    yield raw
+
+
+def send_geocode_request(geocoder, location):
+    return geocoder.geocode(location, addressdetails=True, timeout=30)
 
 
 def configure_subparsers(subparsers):
