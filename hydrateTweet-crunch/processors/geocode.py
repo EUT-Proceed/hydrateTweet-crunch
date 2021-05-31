@@ -64,7 +64,7 @@ def process_lines(
             count += 1
             
             if count > args.requests:
-                utils.log(f'Reached max number of requests ({args.request})')
+                utils.log(f'Reached max number of requests ({args.requests})')
                 break
 
     utils.log('writing the results on the file...')
@@ -77,6 +77,7 @@ def process_lines(
             utils.log(f'{location} generated an exception: {exc}')
         else:
             if res:
+                stats['performance']['input']['locations'] += 1
                 raw = res.raw
                 raw['location'] = location
                 raw['occurrences'] = occurrences
