@@ -15,6 +15,7 @@ from pathlib import Path
 import geopy
 import concurrent.futures
 from time import sleep
+from tqdm import tqdm
 
 from typing import Iterable, Iterator, Mapping, Counter
 
@@ -55,17 +56,18 @@ def process_lines(
     csv_reader = csv.DictReader(dump)
     future_to_geocode = {}
     with concurrent.futures.ThreadPoolExecutor(max_workers=5) as executor:
-        for line in csv_reader:
-            location = line['location']
-            occurrences = line['occurrences']
-            utils.log(f'request to geocode {location}...')
-            future_to_geocode[executor.submit(send_geocode_request, geocoder, location)] = (location, occurrences)
-            sleep(1)
-            count += 1
-            
-            if count > args.requests:
-                utils.log(f'Reached max number of requests ({args.requests})')
-                break
+        with tqdm(total=args.requests) as pbar:
+            for line in csv_reader:
+                location = line['location']
+                occurrences = line['occurrences']
+                future_to_geocode[executor.submit(send_geocode_request, geocoder, location)] = (location, occurrences)
+                pbar.update(1)
+                sleep(1)
+                count += 1
+                
+                if count > args.requests:
+                    utils.log(f'Reached max number of requests ({args.requests})')
+                    break
 
     utils.log('writing the results on the file...')
 
