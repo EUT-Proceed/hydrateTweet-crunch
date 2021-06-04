@@ -61,6 +61,12 @@ def save_geocode_locations(
             for geocode_res in json_reader:
                 stats['performance']['input']['locations'] += 1
                 if 'address' in geocode_res and args.location_type in geocode_res['address']:
+                    if args.specify_country and 'country' in geocode_res['address'] and args.specify_country != geocode_res['address']['country']:
+                        continue
+
+                    if args.specify_state and 'state' in geocode_res['address'] and args.specify_state != geocode_res['address']['state']:
+                        continue
+
                     stats['performance']['input']['valid_locations'] += 1
                     # 3. remove spaces, make it lowercase and then save it
                     clean_loc = re.sub(r"\s+", "", geocode_res['location']).lower()
@@ -110,6 +116,18 @@ def configure_subparsers(subparsers):
         default='state',
         choices={'state', 'state_district', 'country', 'country_code', 'county', 'town', 'municipality', 'postcode', 'village'},
         help='The type of the locations that will be used to map the user into the right file [default: state]'
+    )
+    parser.add_argument(
+        '--specify-country',
+        type=str,
+        default=None,
+        help='Optional parameter used to specify the country aside from the location type [default: None]'
+    )
+    parser.add_argument(
+        '--specify-state',
+        type=str,
+        default=None,
+        help='Optional parameter used to specify the state aside from the location type [default: None]'
     )
 
     parser.set_defaults(func=main, which='map_users_to_location')
