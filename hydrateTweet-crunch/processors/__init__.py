@@ -8,5 +8,7 @@ from . import (
     filter_inferred,
     calc_words_frequency,
     calc_locations_frequency,
-    geocode
+    geocode,
+    map_users_to_location,
+    analyse_locations_emotions
 )

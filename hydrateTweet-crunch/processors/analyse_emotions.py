@@ -174,7 +174,7 @@ def process_lines(
             stats=stats,
             stats_dict=stats_dict,
             users_dict=users_dict,
-            valid_user=valid_users,
+            valid_users=valid_users,
             args=args
         )
         for raw_obj in dump:
@@ -183,7 +183,7 @@ def process_lines(
                 stats=stats,
                 stats_dict=stats_dict,
                 users_dict=users_dict,
-                valid_user=valid_users,
+                valid_users=valid_users,
                 args=args
             )
         return lang
@@ -219,17 +219,17 @@ def process_tweet(
     stats: Mapping,
     users_dict:dict,
     stats_dict:dict,
-    valid_user,
+    valid_users,
     args: argparse.Namespace):
     """Analyze a tweet based on the specifics
     """
 
     full_text = tweet['full_text']
     user_id = str(tweet['user']['id'])
-    if args.filter_users and not user_id in valid_user:
+    if args.filter_users and not user_id in valid_users:
         return
     elif args.filter_users == 'per-category': 
-        category = f'{valid_user[user_id]}_'
+        category = f'{valid_users[user_id]}_'
     else:
         category = ''
         

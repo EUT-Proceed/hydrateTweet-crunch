@@ -33,9 +33,9 @@ def get_args():
     )
     parser.add_argument(
         '--input-type',
-        choices={None, 'json', 'csv'},
+        choices={'json', 'csv'},
         required=False,
-        default=None,
+        default='json',
         help='Input file type [default: None].',
     )
     parser.add_argument(
@@ -55,6 +55,8 @@ def get_args():
     processors.calc_words_frequency.configure_subparsers(subparsers)
     processors.calc_locations_frequency.configure_subparsers(subparsers)
     processors.geocode.configure_subparsers(subparsers)
+    processors.map_users_to_location.configure_subparsers(subparsers)
+    processors.analyse_locations_emotions.configure_subparsers(subparsers)
 
     parsed_args = parser.parse_args()
     if 'func' not in parsed_args:
@@ -82,28 +84,20 @@ def main():
         # https://stackoverflow.com/a/47496703/2377454
         basename = input_file_path.stem
 
-        if args.input_type is None:
-            args.func(
-                input_file_path=input_file_path,
-                basename=basename,
-                args=args,
-                shared=shared
-            )
-        else:
-            if args.input_type == 'json':
-                dump = file_utils.open_jsonobjects_file(str(input_file_path))
-            elif args.input_type == 'csv': 
-                dump = file_utils.open_csv_file(str(input_file_path))
+        if args.input_type == 'json':
+            dump = file_utils.open_jsonobjects_file(str(input_file_path))
+        elif args.input_type == 'csv':
+            dump = file_utils.open_csv_file(str(input_file_path))
 
-            args.func(
-                dump=dump,
-                basename=basename,
-                args=args,
-                shared=shared
-            )
+        args.func(
+            dump=dump,
+            basename=basename,
+            args=args,
+            shared=shared
+        )
 
-            # explicitly close input files
-            dump.close()        
+        # explicitly close input files
+        dump.close()
 
         utils.log("Done Analyzing {}.".format(input_file_path))
     
