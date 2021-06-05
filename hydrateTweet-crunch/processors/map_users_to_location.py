@@ -63,8 +63,12 @@ def save_geocode_locations(
                 if 'address' in geocode_res and args.location_type in geocode_res['address']:
                     if args.specify_country and 'country' in geocode_res['address'] and args.specify_country != geocode_res['address']['country']:
                         continue
+                    elif args.specify_country and not 'country' in geocode_res['address']:
+                        continue
 
                     if args.specify_state and 'state' in geocode_res['address'] and args.specify_state != geocode_res['address']['state']:
+                        continue
+                    elif args.specify_state and not 'state' in geocode_res['address']:
                         continue
 
                     stats['performance']['input']['valid_locations'] += 1
