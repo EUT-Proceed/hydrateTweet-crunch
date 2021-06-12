@@ -1,8 +1,11 @@
 import re
 import os
+import csv
 from enum import Enum
 from . import utils
 from typing import Counter, Dict, Iterator, List
+
+EMOTIONS = ["Positive", "Negative", "Anger", "Anticipation", "Disgust", "Fear", "Joy", "Sadness", "Surprise", "Trust"]
 
 class Emotions(Enum):
     ANGER = 1 << 0
@@ -48,60 +51,34 @@ def getEmotionName(emotion: Emotions) -> str:
     return "unknown"
 
 def initEmotionLexicon(lang = 'en') -> bool:
-    # # English
-    # emotionOrder = [
-    #     Emotions.ANGER, Emotions.ANTICIPATION, Emotions.DISGUST, Emotions.FEAR, Emotions.JOY,
-    #     Emotions.NEGATIVE, Emotions.POSITIVE,Emotions.SADNESS, Emotions.SURPRISE, Emotions.TRUST
-    # ]
-    # path = './assets/NRC-Emotion-Lexicon-Wordlevel-v0.92.txt'
-    # with open(path) as file:
-    #     lines = [l for l in file]
-    #     for i in range(0, len(lines), 10):
-    #         wordLine = [l for l in lines[i:i + 10]]
-    #         term = wordLine[0].split('\t')[0]
-    #         emotions = [Emotions.ANY]
-    #         for j in range(10):
-    #             if int(wordLine[j].split('\t')[2][0]) == 1:
-    #                 emotions.append(emotionOrder[j])
-    #         dic[term] = emotions
-    #         # bitmap = 1 << 10
-    #         # for j in range(10):
-    #         #     bitmap += int(wordLine[j].split('\t')[2][0]) << j
-    #         # dic[term] = bitmap
-
-
-    # Other languages
     emotionOrder = [
         Emotions.POSITIVE, Emotions.NEGATIVE, Emotions.ANGER, Emotions.ANTICIPATION, Emotions.DISGUST,
         Emotions.FEAR, Emotions.JOY, Emotions.SADNESS, Emotions.SURPRISE, Emotions.TRUST
     ]
     path = 'hydrateTweet-crunch/assets/NRC-Emotion-Lexicon-v0.92-In105Languages-Nov2017Translations.csv'
-    with open(path) as file:
-        lines = [l for l in file]
-        # find header column
-        header = lines[0].strip('\n').split(',')[:-10]
-        langCol = -1
-        for i, langHeader in enumerate(header):
-            if langHeader.split('(')[1].split(')')[0] == lang:
-                langCol = i
-                break
-        try:
-            if langCol < 0:
-                raise Exception(f'{lang} is not a recognized language, skipping File') 
-        except Exception as ex:
-            utils.log(ex)
-            return False
 
-        for l in lines[1:]:
-            d = l.strip('\n').split(',')
-            term = d[langCol]
+    with open(path) as csv_file:
+        csv_reader = csv.DictReader(csv_file)
+        for i, line in enumerate(csv_reader):
+            if i == 0:
+                languages =  {}
+                n_languages = len(line) - 11
+                count = 0
+                for column_name in line:
+                    if count > n_languages:
+                        break
+                    languages[column_name.split('(')[-1][:-1]] = column_name
+                    count += 1
+            if not lang in languages:
+                utils.log(f'{lang} is not a recognized language, skipping File')
+                return False
+            term = line[languages[lang]]
             emotions = [Emotions.ANY]
-            for i, x in enumerate(d[-10:]):
-                if x == "1":
-                    emotions.append(emotionOrder[i])
+            for j, emotion in enumerate(EMOTIONS):
+                if emotion in line and line[emotion] == "1":
+                    emotions.append(emotionOrder[j])
             dic[term] = emotions
-        
-        return True
+    return True
 
 
 def tokenize(text: str) -> Iterator[str]:
@@ -118,14 +95,10 @@ def getEmotionsOfWord(word: str) -> List[Emotions]:
     if word not in dic:
         return []
     return dic[word]
-    # d = dic[word]
-    # for e in Emotions:
-    #     if d & e.value != 0:
-    #         yield e
 
 def countEmotionsOfWords(words: Iterator[str], c: Counter[Emotions] = Counter()) -> Counter[Emotions]:
     for w in words:
-        c.update(getEmotionsOfWord(w))
+        c.update(getEmotionsOfWord(w.lower()))
     return c
 
 def countEmotionsOfText(text: str) -> Counter[Emotions]:
