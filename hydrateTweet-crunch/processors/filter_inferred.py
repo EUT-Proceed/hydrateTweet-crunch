@@ -36,6 +36,7 @@ stats_template = '''
             <male>${stats['performance']['input']['male'] | x}</male>
             <female>${stats['performance']['input']['female'] | x}</female>
             <org>${stats['performance']['input']['org'] | x}</org>
+            <valid_age>${stats['performance']['input']['valid_age'] | x}</valid_age>
             <total>${stats['performance']['input']['total'] | x}</total>
         </input>
     </performance>
@@ -58,15 +59,21 @@ def process_lines(
         nobjs = stats['performance']['input']['total']
         if (nobjs-1) % NTWEET == 0:
             utils.dot()
-            
-        if inferred_user['org'] == 'True' and float(inferred_user['org_acc']) >= args.org_acc:
-            inferred_user['category'] = 'org'
-        elif float(inferred_user['gender_acc']) >= args.gender_acc:
-            inferred_user['category'] = inferred_user['gender']
 
-        if 'category' in inferred_user:
-            stats['performance']['input'][inferred_user['category']] += 1
-            yield inferred_user
+        if args.filter == 'per-category':
+            if inferred_user['org'] == 'True' and float(inferred_user['org_acc']) >= args.org_acc:
+                inferred_user['category'] = 'org'
+            elif float(inferred_user['gender_acc']) >= args.gender_acc:
+                inferred_user['category'] = inferred_user['gender']
+
+            if 'category' in inferred_user:
+                stats['performance']['input'][inferred_user['category']] += 1
+                yield inferred_user
+    
+        elif args.filter == 'per-age':
+            if float(inferred_user['age_acc']) >= args.age_acc:
+                stats['performance']['input']['valid_age'] += 1
+                yield inferred_user
 
 
 def configure_subparsers(subparsers):
@@ -74,6 +81,14 @@ def configure_subparsers(subparsers):
     parser = subparsers.add_parser(
         'filter-inferred',
         help='Filter users obtained from m3inference based on specific parameters.',
+    )
+    parser.add_argument(
+        '--filter',
+        type=str,
+        choices = {'per-category', 'per-age'},
+        required=False,
+        default='per-category',
+        help='The criteria that will be considered to select the users [default: per-category].',
     )
     parser.add_argument(
         '--gender-acc',
@@ -88,6 +103,13 @@ def configure_subparsers(subparsers):
         required=False,
         default=0.95,
         help='The minimum organization accuracy an organization should (at least) have in order to be considered [default: 0.95].',
+    )
+    parser.add_argument(
+        '--age-acc',
+        type=float,
+        required=False,
+        default=0.95,
+        help='The minimum age accuracy a user should (at least) have in order to be considered [default: 0.95].',
     )
 
     parser.set_defaults(func=main, which='filter_inferred')
@@ -107,6 +129,7 @@ def main(
                 'male': 0,
                 'female': 0,
                 'org': 0,
+                'valid_age': 0,
                 'total': 0
             },
         },
@@ -153,7 +176,7 @@ def main(
     addHeader = False
 
     if not args.dry_run:
-        stats_path = f"{args.output_dir_path}/filter-inferred/stats/"
+        stats_path = f"{args.output_dir_path}/filter-inferred/{args.filter}/stats"
         Path(stats_path).mkdir(parents=True, exist_ok=True)
         varname = ('{basename}.{func}'
                    .format(basename=basename,
@@ -168,7 +191,7 @@ def main(
             mode='wt'
         )
 
-        file_path = f"{args.output_dir_path}/filter-inferred"
+        file_path = f"{args.output_dir_path}/filter-inferred/{args.filter}"
         Path(file_path).mkdir(parents=True, exist_ok=True)
 
         output_filename = f"{file_path}/{lang}-inferred-users.csv"
