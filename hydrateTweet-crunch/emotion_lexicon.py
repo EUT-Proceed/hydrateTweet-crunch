@@ -1,11 +1,14 @@
 import re
 import os
 import csv
+import spacy
 from enum import Enum
 from . import utils
 from typing import Counter, Dict, Iterator, List
 
 EMOTIONS = ["Positive", "Negative", "Anger", "Anticipation", "Disgust", "Fear", "Joy", "Sadness", "Surprise", "Trust"]
+
+SPACY_SUPP_LANG = {'en': 'en_core_web_sm', 'es': 'es_core_news_sm', 'it': 'it_core_news_sm'}
 
 class Emotions(Enum):
     ANGER = 1 << 0
@@ -22,8 +25,9 @@ class Emotions(Enum):
     def __int__(self):
         return self.value
 
-dic: Dict[str, List[Emotions]] = {}
+nlp = {}
 
+dic: Dict[str, List[Emotions]] = {}
 
 def getEmotionName(emotion: Emotions) -> str:
     if emotion == Emotions.ANGER:
@@ -78,17 +82,28 @@ def initEmotionLexicon(lang = 'en') -> bool:
                 if emotion in line and line[emotion] == "1":
                     emotions.append(emotionOrder[j])
             dic[term] = emotions
+
+    if lang in SPACY_SUPP_LANG:
+        utils.log(f'Loading {lang} for spacy')
+        global nlp
+        nlp = spacy.load(SPACY_SUPP_LANG[lang])
+    else:
+        utils.log(f'{lang} is not supported by spacy, using default tokenizer')
+
     return True
 
 
 def tokenize(text: str) -> Iterator[str]:
-    for match in re.finditer(r'\w+', text, re.UNICODE):
-        yield match.group(0)
+    if nlp:
+        for word in nlp(u'{}'.format(text)):
+            yield word.text
+    else:
+        for match in re.finditer(r'\w+', text, re.UNICODE):
+            yield match.group(0)
 
 def isWordOfEmotion(word: str, emotion: Emotions) -> bool:
     if word in dic:
         return emotion in dic[word]
-        #return (dic[word] & emotion.value) != 0
     return False
 
 def getEmotionsOfWord(word: str) -> List[Emotions]:
