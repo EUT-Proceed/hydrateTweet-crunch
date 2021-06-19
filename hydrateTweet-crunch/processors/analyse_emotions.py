@@ -594,8 +594,12 @@ def standardize(
             for emotion in Emotions:
                 emotion_name = getEmotionName(emotion)
                 if emotion_name in RELEVANT_EMOTIONS:
-                    if args.filter_users == 'per-category':
-                        for category in ['male', 'female', 'org']:
+                    if args.filter_users == 'per-category' or args.filter_users == 'per-age':
+                        if args.filter_users == 'per-category':
+                            categories = ['male', 'female', 'org']
+                        else:
+                            categories = ['>=40', '<40']
+                        for category in categories:
                             emotion_category_name = f"{category}_{emotion_name}"
                             emotion_value = float(line[emotion_category_name])
                             mean = stats_dict[f"{emotion_name}_mean"]
@@ -617,10 +621,17 @@ def standardize(
         output.close()
         csv_file.close()
 
+        if args.filter_users == 'per-category':
+            template = stats_template_finalize_per_category
+        elif args.filter_users == 'per-age':
+            template = stats_template_finalize_per_age
+        else:
+            template = stats_template_finalize
+
         stats['performance']['end_time'] = datetime.datetime.utcnow()
         with stats_output:
             dumper.render_template(
-                stats_template_finalize_per_category if args.filter_users == 'per-category' else stats_template_finalize,
+                template,
                 stats_output,
                 stats=stats,
             )
