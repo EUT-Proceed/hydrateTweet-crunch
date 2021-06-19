@@ -148,6 +148,60 @@ stats_template_finalize_per_category = '''
 </stats>
 '''
 
+stats_template_finalize_per_age = '''
+<stats>
+    <performance>
+        <start_time>${stats['performance']['start_time'] | x}</start_time>
+        <end_time>${stats['performance']['end_time'] | x}</end_time>
+        <input>
+            <lines>${stats['performance']['input']['lines'] | x}</lines>
+        </input>
+    </performance>
+    <results>
+        <less_40_positive_mean>${stats['results']['<40_positive_mean'] | x}<less_40_positive_mean>
+        <less_40_negative_mean>${stats['results']['<40_negative_mean'] | x}<less_40_negative_mean>
+        <less_40_anger_mean>${stats['results']['<40_anger_mean'] | x}<less_40_anger_mean>
+        <less_40_anticipation_mean>${stats['results']['<40_anticipation_mean'] | x}<less_40_anticipation_mean>
+        <less_40_disgust_mean>${stats['results']['<40_disgust_mean'] | x}<less_40_disgust_mean>
+        <less_40_fear_mean>${stats['results']['<40_fear_mean'] | x}<less_40_fear_mean>
+        <less_40_joy_mean>${stats['results']['<40_joy_mean'] | x}<less_40_joy_mean>
+        <less_40_sadness_mean>${stats['results']['<40_sadness_mean'] | x}<less_40_sadness_mean>
+        <less_40_surprise_mean>${stats['results']['<40_surprise_mean'] | x}<less_40_surprise_mean>
+        <less_40_trust_mean>${stats['results']['<40_trust_mean'] | x}<less_40_trust_mean>
+        <grt_or_eq_40_positive_mean>${stats['results']['>=40_positive_mean'] | x}<grt_or_eq_40_positive_mean>
+        <grt_or_eq_40_negative_mean>${stats['results']['>=40_negative_mean'] | x}<grt_or_eq_40_negative_mean>
+        <grt_or_eq_40_anger_mean>${stats['results']['>=40_anger_mean'] | x}<grt_or_eq_40_anger_mean>
+        <grt_or_eq_40_anticipation_mean>${stats['results']['>=40_anticipation_mean'] | x}<grt_or_eq_40_anticipation_mean>
+        <grt_or_eq_40_disgust_mean>${stats['results']['>=40_disgust_mean'] | x}<grt_or_eq_40_disgust_mean>
+        <grt_or_eq_40_fear_mean>${stats['results']['>=40_fear_mean'] | x}<grt_or_eq_40_fear_mean>
+        <grt_or_eq_40_joy_mean>${stats['results']['>=40_joy_mean'] | x}<grt_or_eq_40_joy_mean>
+        <grt_or_eq_40_sadness_mean>${stats['results']['>=40_sadness_mean'] | x}<grt_or_eq_40_sadness_mean>
+        <grt_or_eq_40_surprise_mean>${stats['results']['>=40_surprise_mean'] | x}<grt_or_eq_40_surprise_mean>
+        <grt_or_eq_40_trust_mean>${stats['results']['>=40_trust_mean'] | x}<grt_or_eq_40_trust_mean>
+        <less_40_positive_stdv>${stats['results']['<40_positive_stdv'] | x}<less_40_positive_stdv>
+        <less_40_negative_stdv>${stats['results']['<40_negative_stdv'] | x}<less_40_negative_stdv>
+        <less_40_anger_stdv>${stats['results']['<40_anger_stdv'] | x}<less_40_anger_stdv>
+        <less_40_anticipation_stdv>${stats['results']['<40_anticipation_stdv'] | x}<less_40_anticipation_stdv>
+        <less_40_disgust_stdv>${stats['results']['<40_disgust_stdv'] | x}<less_40_disgust_stdv>
+        <less_40_fear_stdv>${stats['results']['<40_fear_stdv'] | x}<less_40_fear_stdv>
+        <less_40_joy_stdv>${stats['results']['<40_joy_stdv'] | x}<less_40_joy_stdv>
+        <less_40_sadness_stdv>${stats['results']['<40_sadness_stdv'] | x}<less_40_sadness_stdv>
+        <less_40_surprise_stdv>${stats['results']['<40_surprise_stdv'] | x}<less_40_surprise_stdv>
+        <less_40_trust_stdv>${stats['results']['<40_trust_stdv'] | x}<less_40_trust_stdv>
+        <grt_or_eq_40_positive_stdv>${stats['results']['>=40_positive_stdv'] | x}<grt_or_eq_40_positive_stdv>
+        <grt_or_eq_40_negative_stdv>${stats['results']['>=40_negative_stdv'] | x}<grt_or_eq_40_negative_stdv>
+        <grt_or_eq_40_anger_stdv>${stats['results']['>=40_anger_stdv'] | x}<grt_or_eq_40_anger_stdv>
+        <grt_or_eq_40_anticipation_stdv>${stats['results']['>=40_anticipation_stdv'] | x}<grt_or_eq_40_anticipation_stdv>
+        <grt_or_eq_40_disgust_stdv>${stats['results']['>=40_disgust_stdv'] | x}<grt_or_eq_40_disgust_stdv>
+        <grt_or_eq_40_fear_stdv>${stats['results']['>=40_fear_stdv'] | x}<grt_or_eq_40_fear_stdv>
+        <grt_or_eq_40_joy_stdv>${stats['results']['>=40_joy_stdv'] | x}<grt_or_eq_40_joy_stdv>
+        <grt_or_eq_40_sadness_stdv>${stats['results']['>=40_sadness_stdv'] | x}<grt_or_eq_40_sadness_stdv>
+        <grt_or_eq_40_surprise_stdv>${stats['results']['>=40_surprise_stdv'] | x}<grt_or_eq_40_surprise_stdv>
+        <grt_or_eq_40_trust_stdv>${stats['results']['>=40_trust_stdv'] | x}<grt_or_eq_40_trust_stdv>
+    <results>
+</stats>
+'''
+
 RELEVANT_EMOTIONS = ["positive", "negative", "anger", "anticipation", "disgust", "fear", "joy", "sadness", "surprise", "trust"]
 
 def process_lines(
@@ -195,12 +249,21 @@ def get_valid_users(args: argparse.Namespace,
                     lang: str):
     if args.filter_users == 'per-category':
         for compression in ['', '.gz', '.7z', '.bz2']:
-            csv_file = f"{args.output_dir_path}/filter-inferred/{lang}-inferred-users.csv{compression}"
+            csv_file = f"{args.output_dir_path}/filter-inferred/per-category/{lang}-inferred-users.csv{compression}"
             if os.path.exists(csv_file):
                 csv_reader = csv.DictReader(fu.open_csv_file(csv_file))
                 valid_users = {}
                 for inferred_user in csv_reader:
                     valid_users[inferred_user["id_str"]] = inferred_user["category"]
+                return valid_users
+    elif args.filter_users == 'per-age':
+        for compression in ['', '.gz', '.7z', '.bz2']:
+            csv_file = f"{args.output_dir_path}/filter-inferred/per-age/{lang}-inferred-users.csv{compression}"
+            if os.path.exists(csv_file):
+                csv_reader = csv.DictReader(fu.open_csv_file(csv_file))
+                valid_users = {}
+                for inferred_user in csv_reader:
+                    valid_users[inferred_user["id_str"]] = inferred_user["age"]
                 return valid_users
     elif args.filter_users == 'per-tweet-number':
         for compression in ['', '.gz', '.7z', '.bz2']:
@@ -228,7 +291,7 @@ def process_tweet(
     user_id = str(tweet['user']['id'])
     if args.filter_users and not user_id in valid_users:
         return
-    elif args.filter_users == 'per-category': 
+    elif args.filter_users == 'per-category' or args.filter_users == 'per-age':
         category = f'{valid_users[user_id]}_'
     else:
         category = ''
@@ -272,6 +335,26 @@ def new_emotions_dict() -> dict:
     return emotions
 
 
+def calculate_emotions(
+        stats_dict:dict,
+        args:argparse.Namespace
+    ):
+    for emotion in Emotions:
+        emotion_name = getEmotionName(emotion)
+        if args.filter_users == 'per-category' or args.filter_users == 'per-age':
+            if args.filter_users == 'per-category':
+                categories = ['male', 'female', 'org']
+            else:
+                categories = ['>=40', '<40']
+            for category in categories:
+                emotion_category_name = f"{category}_{emotion_name}"
+                if emotion_name in RELEVANT_EMOTIONS and stats_dict[f'{category}_total'] > 0:
+                    stats_dict[emotion_category_name] = stats_dict[f'{emotion_category_name}_count']/stats_dict[f'{category}_total']
+        else:
+            if emotion_name in RELEVANT_EMOTIONS and stats_dict['total'] > 0:
+                stats_dict[emotion_name] = stats_dict[f'{emotion_name}_count']/stats_dict['total']
+
+
 def configure_subparsers(subparsers):
     """Configure a new subparser ."""
     parser = subparsers.add_parser(
@@ -285,10 +368,10 @@ def configure_subparsers(subparsers):
     )
     parser.add_argument(
         '--filter-users', '-f',
-        choices={'per-category', 'per-tweet-number'},
+        choices={'per-category', 'per-age', 'per-tweet-number'},
         required=False,
         default=None,
-        help='Filter users in three main categories (male, female, org) or based on their number of tweets over the dataset [default: None]',
+        help='Filter users per category (male, female, org), per age (>=40, <40) or based on their number of tweets over the dataset [default: None]',
     )
     parser.add_argument(
         '--standardize', '-s',
@@ -298,20 +381,6 @@ def configure_subparsers(subparsers):
 
     parser.set_defaults(func=main, which='analyse_emotions')
 
-def calculate_emotions(
-        stats_dict:dict,
-        args:argparse.Namespace
-    ):
-    for emotion in Emotions:
-        emotion_name = getEmotionName(emotion)
-        if args.filter_users == 'per-category':
-            for category in ['male', 'female', 'org']:
-                emotion_category_name = f"{category}_{emotion_name}"
-                if emotion_name in RELEVANT_EMOTIONS and stats_dict[f'{category}_total'] > 0:
-                    stats_dict[emotion_category_name] = stats_dict[f'{emotion_category_name}_count']/stats_dict[f'{category}_total']
-        else:
-            if emotion_name in RELEVANT_EMOTIONS and stats_dict['total'] > 0:
-                stats_dict[emotion_name] = stats_dict[f'{emotion_name}_count']/stats_dict['total']
 
 def main(
         dump: Iterable[list],
@@ -375,6 +444,8 @@ def main(
 
         if args.filter_users == 'per-category':
             stats_filename = f"{stats_filename}-per-category"
+        elif args.filter_users == 'per-age':
+            stats_filename = f"{stats_filename}-per-age"
         elif args.filter_users == 'per-tweet-number':
             stats_filename = f"{stats_filename}-filtered"
 
@@ -398,6 +469,8 @@ def main(
 
             if args.filter_users == 'per-category':
                 output_filename = f"{output_filename}-per-category"
+            elif args.filter_users == 'per-age':
+                output_filename = f"{output_filename}-per-age"
             elif args.filter_users == 'per-tweet-number':
                 output_filename = f"{output_filename}-filtered"
 
@@ -567,8 +640,12 @@ def calculate_means(
         for emotion in Emotions:
             emotion_name = getEmotionName(emotion)
             if emotion_name in RELEVANT_EMOTIONS:
-                if args.filter_users == 'per-category':
-                    for category in ['male', 'female', 'org']:
+                if args.filter_users == 'per-category' or args.filter_users == 'per-age':
+                    if args.filter_users == 'per-category':
+                        categories = ['male', 'female', 'org']
+                    else:
+                        categories = ['>=40', '<40']
+                    for category in categories:
                         emotion_category_name = f"{category}_{emotion_name}"
                         stats_dict[f"{emotion_name}_mean"] += float(line[emotion_category_name])
                 else:
@@ -578,9 +655,13 @@ def calculate_means(
             emotion_name = getEmotionName(emotion)
             if emotion_name in RELEVANT_EMOTIONS:
                 stats_dict[f"{emotion_name}_mean"] /= stats_dict["days"]
-                if args.filter_users == 'per-category':
-                    stats_dict[f"{emotion_name}_mean"] /= 3
-                    for category in ['male', 'female', 'org']:
+                if args.filter_users == 'per-category' or args.filter_users == 'per-age':
+                    if args.filter_users == 'per-category':
+                        categories = ['male', 'female', 'org']
+                    else:
+                        categories = ['>=40', '<40']
+                    stats_dict[f"{emotion_name}_mean"] /= len(categories)
+                    for category in categories:
                         emotion_category_name = f"{category}_{emotion_name}"
                         stats['results'][f"{emotion_category_name}_mean"] = stats_dict[f"{emotion_name}_mean"]
                 else:
@@ -601,9 +682,13 @@ def calculate_stdvs(
             emotion_name = getEmotionName(emotion)
             if emotion_name in RELEVANT_EMOTIONS:
                 mean = stats_dict[f"{emotion_name}_mean"]
-                if args.filter_users == 'per-category':
+                if args.filter_users == 'per-category' or args.filter_users == 'per-age':
+                    if args.filter_users == 'per-category':
+                        categories = ['male', 'female', 'org']
+                    else:
+                        categories = ['>=40', '<40']
                     emotion_value_over_total = 0
-                    for category in ['male', 'female', 'org']:
+                    for category in categories:
                         emotion_category_name = f"{category}_{emotion_name}"
                         emotion_value = float(line[emotion_category_name])
                         emotion_value_over_total += emotion_value
@@ -615,9 +700,13 @@ def calculate_stdvs(
     for emotion in Emotions:
         emotion_name = getEmotionName(emotion)
         if emotion_name in RELEVANT_EMOTIONS:
-            if args.filter_users == 'per-category':
+            if args.filter_users == 'per-category' or args.filter_users == 'per-age':
                 stats_dict[f"{emotion_name}_stdv"] = math.sqrt(stats_dict[f"{emotion_name}_stdv"] / stats_dict["days"])
-                for category in ['male', 'female', 'org']:
+                if args.filter_users == 'per-category':
+                    categories = ['male', 'female', 'org']
+                else:
+                    categories = ['>=40', '<40']
+                for category in categories:
                     emotion_category_name = f"{category}_{emotion_name}"
                     stats['results'][f"{emotion_category_name}_stdv"] = stats_dict[f"{emotion_name}_stdv"]
             else:
@@ -693,7 +782,53 @@ def get_main_fieldnames(args: argparse.Namespace) -> Iterable[str]:
             "org_sadness_count", 
             "org_surprise_count", 
             "org_trust_count"                        
-        ] 
+        ]
+    elif args.filter_users == 'per-age':
+        return [
+            "date",
+            "<40_positive", 
+            "<40_negative", 
+            "<40_anger", 
+            "<40_anticipation", 
+            "<40_disgust", 
+            "<40_fear", 
+            "<40_joy", 
+            "<40_sadness", 
+            "<40_surprise", 
+            "<40_trust", 
+            "<40_total",
+            ">=40_positive", 
+            ">=40_negative", 
+            ">=40_anger", 
+            ">=40_anticipation", 
+            ">=40_disgust", 
+            ">=40_fear", 
+            ">=40_joy", 
+            ">=40_sadness", 
+            ">=40_surprise", 
+            ">=40_trust", 
+            ">=40_total",
+            "<40_positive_count", 
+            "<40_negative_count", 
+            "<40_anger_count", 
+            "<40_anticipation_count", 
+            "<40_disgust_count", 
+            "<40_fear_count", 
+            "<40_joy_count", 
+            "<40_sadness_count", 
+            "<40_surprise_count", 
+            "<40_trust_count",
+            ">=40_positive_count", 
+            ">=40_negative_count", 
+            ">=40_anger_count", 
+            ">=40_anticipation_count", 
+            ">=40_disgust_count", 
+            ">=40_fear_count", 
+            ">=40_joy_count", 
+            ">=40_sadness_count", 
+            ">=40_surprise_count", 
+            ">=40_trust_count"
+        ]
     else:
         return [
             "date",
@@ -791,6 +926,56 @@ def get_standardize_stats(args: argparse.Namespace) -> dict:
                 'org_trust_stdv': 0                
             }
         }
+    elif args.filter_users == 'per-age':
+        return {
+            'performance': {
+                'start_time': None,
+                'end_time': None,
+                'input': {
+                    'lines': 0
+                },
+            },
+            'results':{
+                '<40_negative_mean': 0, 
+                '<40_anger_mean': 0, 
+                '<40_anticipation_mean': 0, 
+                '<40_disgust_mean': 0, 
+                '<40_fear_mean': 0, 
+                '<40_joy_mean': 0, 
+                '<40_sadness_mean': 0, 
+                '<40_surprise_mean': 0, 
+                '<40_trust_mean': 0,
+                '<40_positive_stdv': 0,
+                '<40_negative_stdv': 0, 
+                '<40_anger_stdv': 0, 
+                '<40_anticipation_stdv': 0, 
+                '<40_disgust_stdv': 0, 
+                '<40_fear_stdv': 0, 
+                '<40_joy_stdv': 0, 
+                '<40_sadness_stdv': 0, 
+                '<40_surprise_stdv': 0, 
+                '<40_trust_stdv': 0,
+                '>=40_negative_mean': 0, 
+                '>=40_anger_mean': 0, 
+                '>=40_anticipation_mean': 0, 
+                '>=40_disgust_mean': 0, 
+                '>=40_fear_mean': 0, 
+                '>=40_joy_mean': 0, 
+                '>=40_sadness_mean': 0, 
+                '>=40_surprise_mean': 0, 
+                '>=40_trust_mean': 0,
+                '>=40_positive_stdv': 0,
+                '>=40_negative_stdv': 0, 
+                '>=40_anger_stdv': 0, 
+                '>=40_anticipation_stdv': 0, 
+                '>=40_disgust_stdv': 0, 
+                '>=40_fear_stdv': 0, 
+                '>=40_joy_stdv': 0, 
+                '>=40_sadness_stdv': 0, 
+                '>=40_surprise_stdv': 0, 
+                '>=40_trust_stdv': 0              
+            }
+        }
     else:
         return {
             'performance': {
@@ -859,6 +1044,30 @@ def get_standardize_fieldnames(args: argparse.Namespace) -> Iterable[str]:
             "org_sadness", 
             "org_surprise", 
             "org_trust"
+        ]
+    elif args.filter_users == 'per-age':
+        return [
+            "date",
+            "<40_positive", 
+            "<40_negative", 
+            "<40_anger", 
+            "<40_anticipation", 
+            "<40_disgust", 
+            "<40_fear", 
+            "<40_joy", 
+            "<40_sadness", 
+            "<40_surprise", 
+            "<40_trust",
+            ">=40_positive", 
+            ">=40_negative", 
+            ">=40_anger", 
+            ">=40_anticipation", 
+            ">=40_disgust", 
+            ">=40_fear", 
+            ">=40_joy", 
+            ">=40_sadness", 
+            ">=40_surprise", 
+            ">=40_trust"
         ]
     else:
         return [
