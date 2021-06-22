@@ -57,6 +57,7 @@ def get_args():
     processors.geocode.configure_subparsers(subparsers)
     processors.map_users_to_location.configure_subparsers(subparsers)
     processors.analyse_locations_emotions.configure_subparsers(subparsers)
+    processors.analyse_liwc_categories.configure_subparsers(subparsers)
 
     parsed_args = parser.parse_args()
     if 'func' not in parsed_args:
@@ -65,6 +66,9 @@ def get_args():
 
     if 'which' in parsed_args and parsed_args.which == 'analyse_emotions' and parsed_args.standardize:
         parsed_args.finalize=processors.analyse_emotions.standardize
+    
+    if 'which' in parsed_args and parsed_args.which == 'analyse_liwc_categories' and parsed_args.standardize:
+        parsed_args.finalize=processors.analyse_liwc_categories.standardize
 
     return parsed_args
 

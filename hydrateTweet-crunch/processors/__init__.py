@@ -10,5 +10,6 @@ from . import (
     calc_locations_frequency,
     geocode,
     map_users_to_location,
-    analyse_locations_emotions
+    analyse_locations_emotions,
+    analyse_liwc_categories
 )

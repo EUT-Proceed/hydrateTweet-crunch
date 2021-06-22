@@ -50,27 +50,27 @@ stats_template_finalize = '''
         </input>
     </performance>
     <results>
-        <positive_mean>${stats['results']['positive_mean'] | x}<positive_mean>
-        <negative_mean>${stats['results']['negative_mean'] | x}<negative_mean>
-        <anger_mean>${stats['results']['anger_mean'] | x}<anger_mean>
-        <anticipation_mean>${stats['results']['anticipation_mean'] | x}<anticipation_mean>
-        <disgust_mean>${stats['results']['disgust_mean'] | x}<disgust_mean>
-        <fear_mean>${stats['results']['fear_mean'] | x}<fear_mean>
-        <joy_mean>${stats['results']['joy_mean'] | x}<joy_mean>
-        <sadness_mean>${stats['results']['sadness_mean'] | x}<sadness_mean>
-        <surprise_mean>${stats['results']['surprise_mean'] | x}<surprise_mean>
-        <trust_mean>${stats['results']['trust_mean'] | x}<trust_mean>
-        <positive_stdv>${stats['results']['positive_stdv'] | x}<positive_stdv>
-        <negative_stdv>${stats['results']['negative_stdv'] | x}<negative_stdv>
-        <anger_stdv>${stats['results']['anger_stdv'] | x}<anger_stdv>
-        <anticipation_stdv>${stats['results']['anticipation_stdv'] | x}<anticipation_stdv>
-        <disgust_stdv>${stats['results']['disgust_stdv'] | x}<disgust_stdv>
-        <fear_stdv>${stats['results']['fear_stdv'] | x}<fear_stdv>
-        <joy_stdv>${stats['results']['joy_stdv'] | x}<joy_stdv>
-        <sadness_stdv>${stats['results']['sadness_stdv'] | x}<sadness_stdv>
-        <surprise_stdv>${stats['results']['surprise_stdv'] | x}<surprise_stdv>
-        <trust_stdv>${stats['results']['trust_stdv'] | x}<trust_stdv>
-    <results>
+        <positive_mean>${stats['results']['positive_mean'] | x}</positive_mean>
+        <negative_mean>${stats['results']['negative_mean'] | x}</negative_mean>
+        <anger_mean>${stats['results']['anger_mean'] | x}</anger_mean>
+        <anticipation_mean>${stats['results']['anticipation_mean'] | x}</anticipation_mean>
+        <disgust_mean>${stats['results']['disgust_mean'] | x}</disgust_mean>
+        <fear_mean>${stats['results']['fear_mean'] | x}</fear_mean>
+        <joy_mean>${stats['results']['joy_mean'] | x}</joy_mean>
+        <sadness_mean>${stats['results']['sadness_mean'] | x}</sadness_mean>
+        <surprise_mean>${stats['results']['surprise_mean'] | x}</surprise_mean>
+        <trust_mean>${stats['results']['trust_mean'] | x}<vtrust_mean>
+        <positive_stdv>${stats['results']['positive_stdv'] | x}</positive_stdv>
+        <negative_stdv>${stats['results']['negative_stdv'] | x}</negative_stdv>
+        <anger_stdv>${stats['results']['anger_stdv'] | x}</anger_stdv>
+        <anticipation_stdv>${stats['results']['anticipation_stdv'] | x}</anticipation_stdv>
+        <disgust_stdv>${stats['results']['disgust_stdv'] | x}</disgust_stdv>
+        <fear_stdv>${stats['results']['fear_stdv'] | x}</fear_stdv>
+        <joy_stdv>${stats['results']['joy_stdv'] | x}</joy_stdv>
+        <sadness_stdv>${stats['results']['sadness_stdv'] | x}</sadness_stdv>
+        <surprise_stdv>${stats['results']['surprise_stdv'] | x}</surprise_stdv>
+        <trust_stdv>${stats['results']['trust_stdv'] | x}</trust_stdv>
+    </results>
 </stats>
 '''
 
@@ -84,67 +84,67 @@ stats_template_finalize_per_category = '''
         </input>
     </performance>
     <results>
-        <male_positive_mean>${stats['results']['male_positive_mean'] | x}<male_positive_mean>
-        <male_negative_mean>${stats['results']['male_negative_mean'] | x}<male_negative_mean>
-        <male_anger_mean>${stats['results']['male_anger_mean'] | x}<male_anger_mean>
-        <male_anticipation_mean>${stats['results']['male_anticipation_mean'] | x}<male_anticipation_mean>
-        <male_disgust_mean>${stats['results']['male_disgust_mean'] | x}<male_disgust_mean>
-        <male_fear_mean>${stats['results']['male_fear_mean'] | x}<male_fear_mean>
-        <male_joy_mean>${stats['results']['male_joy_mean'] | x}<male_joy_mean>
-        <male_sadness_mean>${stats['results']['male_sadness_mean'] | x}<male_sadness_mean>
-        <male_surprise_mean>${stats['results']['male_surprise_mean'] | x}<male_surprise_mean>
-        <male_trust_mean>${stats['results']['male_trust_mean'] | x}<male_trust_mean>
-        <female_positive_mean>${stats['results']['female_positive_mean'] | x}<female_positive_mean>
-        <female_negative_mean>${stats['results']['female_negative_mean'] | x}<female_negative_mean>
-        <female_anger_mean>${stats['results']['female_anger_mean'] | x}<female_anger_mean>
-        <female_anticipation_mean>${stats['results']['female_anticipation_mean'] | x}<female_anticipation_mean>
-        <female_disgust_mean>${stats['results']['female_disgust_mean'] | x}<female_disgust_mean>
-        <female_fear_mean>${stats['results']['female_fear_mean'] | x}<female_fear_mean>
-        <female_joy_mean>${stats['results']['female_joy_mean'] | x}<female_joy_mean>
-        <female_sadness_mean>${stats['results']['female_sadness_mean'] | x}<female_sadness_mean>
-        <female_surprise_mean>${stats['results']['female_surprise_mean'] | x}<female_surprise_mean>
-        <female_trust_mean>${stats['results']['female_trust_mean'] | x}<female_trust_mean>
-        <org_positive_mean>${stats['results']['org_positive_mean'] | x}<org_positive_mean>
-        <org_negative_mean>${stats['results']['org_negative_mean'] | x}<org_negative_mean>
-        <org_anger_mean>${stats['results']['org_anger_mean'] | x}<org_anger_mean>
-        <org_anticipation_mean>${stats['results']['org_anticipation_mean'] | x}<org_anticipation_mean>
-        <org_disgust_mean>${stats['results']['org_disgust_mean'] | x}<org_disgust_mean>
-        <org_fear_mean>${stats['results']['org_fear_mean'] | x}<org_fear_mean>
-        <org_joy_mean>${stats['results']['org_joy_mean'] | x}<org_joy_mean>
-        <org_sadness_mean>${stats['results']['org_sadness_mean'] | x}<org_sadness_mean>
-        <org_surprise_mean>${stats['results']['org_surprise_mean'] | x}<org_surprise_mean>
-        <org_trust_mean>${stats['results']['org_trust_mean'] | x}<org_trust_mean>
-        <male_positive_stdv>${stats['results']['male_positive_stdv'] | x}<male_positive_stdv>
-        <male_negative_stdv>${stats['results']['male_negative_stdv'] | x}<male_negative_stdv>
-        <male_anger_stdv>${stats['results']['male_anger_stdv'] | x}<male_anger_stdv>
-        <male_anticipation_stdv>${stats['results']['male_anticipation_stdv'] | x}<male_anticipation_stdv>
-        <male_disgust_stdv>${stats['results']['male_disgust_stdv'] | x}<male_disgust_stdv>
-        <male_fear_stdv>${stats['results']['male_fear_stdv'] | x}<male_fear_stdv>
-        <male_joy_stdv>${stats['results']['male_joy_stdv'] | x}<male_joy_stdv>
-        <male_sadness_stdv>${stats['results']['male_sadness_stdv'] | x}<male_sadness_stdv>
-        <male_surprise_stdv>${stats['results']['male_surprise_stdv'] | x}<male_surprise_stdv>
-        <male_trust_stdv>${stats['results']['male_trust_stdv'] | x}<male_trust_stdv>
-        <female_positive_stdv>${stats['results']['female_positive_stdv'] | x}<female_positive_stdv>
-        <female_negative_stdv>${stats['results']['female_negative_stdv'] | x}<female_negative_stdv>
-        <female_anger_stdv>${stats['results']['female_anger_stdv'] | x}<female_anger_stdv>
-        <female_anticipation_stdv>${stats['results']['female_anticipation_stdv'] | x}<female_anticipation_stdv>
-        <female_disgust_stdv>${stats['results']['female_disgust_stdv'] | x}<female_disgust_stdv>
-        <female_fear_stdv>${stats['results']['female_fear_stdv'] | x}<female_fear_stdv>
-        <female_joy_stdv>${stats['results']['female_joy_stdv'] | x}<female_joy_stdv>
-        <female_sadness_stdv>${stats['results']['female_sadness_stdv'] | x}<female_sadness_stdv>
-        <female_surprise_stdv>${stats['results']['female_surprise_stdv'] | x}<female_surprise_stdv>
-        <female_trust_stdv>${stats['results']['female_trust_stdv'] | x}<female_trust_stdv>
-        <org_positive_stdv>${stats['results']['org_positive_stdv'] | x}<org_positive_stdv>
-        <org_negative_stdv>${stats['results']['org_negative_stdv'] | x}<org_negative_stdv>
-        <org_anger_stdv>${stats['results']['org_anger_stdv'] | x}<org_anger_stdv>
-        <org_anticipation_stdv>${stats['results']['org_anticipation_stdv'] | x}<org_anticipation_stdv>
-        <org_disgust_stdv>${stats['results']['org_disgust_stdv'] | x}<org_disgust_stdv>
-        <org_fear_stdv>${stats['results']['org_fear_stdv'] | x}<org_fear_stdv>
-        <org_joy_stdv>${stats['results']['org_joy_stdv'] | x}<org_joy_stdv>
-        <org_sadness_stdv>${stats['results']['org_sadness_stdv'] | x}<org_sadness_stdv>
-        <org_surprise_stdv>${stats['results']['org_surprise_stdv'] | x}<org_surprise_stdv>
-        <org_trust_stdv>${stats['results']['org_trust_stdv'] | x}<org_trust_stdv>
-    <results>
+        <male_positive_mean>${stats['results']['male_positive_mean'] | x}</male_positive_mean>
+        <male_negative_mean>${stats['results']['male_negative_mean'] | x}</male_negative_mean>
+        <male_anger_mean>${stats['results']['male_anger_mean'] | x}</male_anger_mean>
+        <male_anticipation_mean>${stats['results']['male_anticipation_mean'] | x}</male_anticipation_mean>
+        <male_disgust_mean>${stats['results']['male_disgust_mean'] | x}</male_disgust_mean>
+        <male_fear_mean>${stats['results']['male_fear_mean'] | x}</male_fear_mean>
+        <male_joy_mean>${stats['results']['male_joy_mean'] | x}</male_joy_mean>
+        <male_sadness_mean>${stats['results']['male_sadness_mean'] | x}</male_sadness_mean>
+        <male_surprise_mean>${stats['results']['male_surprise_mean'] | x}</male_surprise_mean>
+        <male_trust_mean>${stats['results']['male_trust_mean'] | x}</male_trust_mean>
+        <female_positive_mean>${stats['results']['female_positive_mean'] | x}</female_positive_mean>
+        <female_negative_mean>${stats['results']['female_negative_mean'] | x}</female_negative_mean>
+        <female_anger_mean>${stats['results']['female_anger_mean'] | x}</female_anger_mean>
+        <female_anticipation_mean>${stats['results']['female_anticipation_mean'] | x}</female_anticipation_mean>
+        <female_disgust_mean>${stats['results']['female_disgust_mean'] | x}</female_disgust_mean>
+        <female_fear_mean>${stats['results']['female_fear_mean'] | x}</female_fear_mean>
+        <female_joy_mean>${stats['results']['female_joy_mean'] | x}</female_joy_mean>
+        <female_sadness_mean>${stats['results']['female_sadness_mean'] | x}</female_sadness_mean>
+        <female_surprise_mean>${stats['results']['female_surprise_mean'] | x}</female_surprise_mean>
+        <female_trust_mean>${stats['results']['female_trust_mean'] | x}</female_trust_mean>
+        <org_positive_mean>${stats['results']['org_positive_mean'] | x}</org_positive_mean>
+        <org_negative_mean>${stats['results']['org_negative_mean'] | x}</org_negative_mean>
+        <org_anger_mean>${stats['results']['org_anger_mean'] | x}</org_anger_mean>
+        <org_anticipation_mean>${stats['results']['org_anticipation_mean'] | x}</org_anticipation_mean>
+        <org_disgust_mean>${stats['results']['org_disgust_mean'] | x}</org_disgust_mean>
+        <org_fear_mean>${stats['results']['org_fear_mean'] | x}</org_fear_mean>
+        <org_joy_mean>${stats['results']['org_joy_mean'] | x}</org_joy_mean>
+        <org_sadness_mean>${stats['results']['org_sadness_mean'] | x}</org_sadness_mean>
+        <org_surprise_mean>${stats['results']['org_surprise_mean'] | x}</org_surprise_mean>
+        <org_trust_mean>${stats['results']['org_trust_mean'] | x}</org_trust_mean>
+        <male_positive_stdv>${stats['results']['male_positive_stdv'] | x}</male_positive_stdv>
+        <male_negative_stdv>${stats['results']['male_negative_stdv'] | x}</male_negative_stdv>
+        <male_anger_stdv>${stats['results']['male_anger_stdv'] | x}</male_anger_stdv>
+        <male_anticipation_stdv>${stats['results']['male_anticipation_stdv'] | x}</male_anticipation_stdv>
+        <male_disgust_stdv>${stats['results']['male_disgust_stdv'] | x}</male_disgust_stdv>
+        <male_fear_stdv>${stats['results']['male_fear_stdv'] | x}</male_fear_stdv>
+        <male_joy_stdv>${stats['results']['male_joy_stdv'] | x}</male_joy_stdv>
+        <male_sadness_stdv>${stats['results']['male_sadness_stdv'] | x}</male_sadness_stdv>
+        <male_surprise_stdv>${stats['results']['male_surprise_stdv'] | x}</male_surprise_stdv>
+        <male_trust_stdv>${stats['results']['male_trust_stdv'] | x}</male_trust_stdv>
+        <female_positive_stdv>${stats['results']['female_positive_stdv'] | x}</female_positive_stdv>
+        <female_negative_stdv>${stats['results']['female_negative_stdv'] | x}</female_negative_stdv>
+        <female_anger_stdv>${stats['results']['female_anger_stdv'] | x}</female_anger_stdv>
+        <female_anticipation_stdv>${stats['results']['female_anticipation_stdv'] | x}</female_anticipation_stdv>
+        <female_disgust_stdv>${stats['results']['female_disgust_stdv'] | x}</female_disgust_stdv>
+        <female_fear_stdv>${stats['results']['female_fear_stdv'] | x}</female_fear_stdv>
+        <female_joy_stdv>${stats['results']['female_joy_stdv'] | x}</female_joy_stdv>
+        <female_sadness_stdv>${stats['results']['female_sadness_stdv'] | x}</female_sadness_stdv>
+        <female_surprise_stdv>${stats['results']['female_surprise_stdv'] | x}</female_surprise_stdv>
+        <female_trust_stdv>${stats['results']['female_trust_stdv'] | x}</female_trust_stdv>
+        <org_positive_stdv>${stats['results']['org_positive_stdv'] | x}</org_positive_stdv>
+        <org_negative_stdv>${stats['results']['org_negative_stdv'] | x}</org_negative_stdv>
+        <org_anger_stdv>${stats['results']['org_anger_stdv'] | x}</org_anger_stdv>
+        <org_anticipation_stdv>${stats['results']['org_anticipation_stdv'] | x}</org_anticipation_stdv>
+        <org_disgust_stdv>${stats['results']['org_disgust_stdv'] | x}</org_disgust_stdv>
+        <org_fear_stdv>${stats['results']['org_fear_stdv'] | x}</org_fear_stdv>
+        <org_joy_stdv>${stats['results']['org_joy_stdv'] | x}</org_joy_stdv>
+        <org_sadness_stdv>${stats['results']['org_sadness_stdv'] | x}</org_sadness_stdv>
+        <org_surprise_stdv>${stats['results']['org_surprise_stdv'] | x}</org_surprise_stdv>
+        <org_trust_stdv>${stats['results']['org_trust_stdv'] | x}</org_trust_stdv>
+    </results>
 </stats>
 '''
 
@@ -158,47 +158,47 @@ stats_template_finalize_per_age = '''
         </input>
     </performance>
     <results>
-        <less_40_positive_mean>${stats['results']['<40_positive_mean'] | x}<less_40_positive_mean>
-        <less_40_negative_mean>${stats['results']['<40_negative_mean'] | x}<less_40_negative_mean>
-        <less_40_anger_mean>${stats['results']['<40_anger_mean'] | x}<less_40_anger_mean>
-        <less_40_anticipation_mean>${stats['results']['<40_anticipation_mean'] | x}<less_40_anticipation_mean>
-        <less_40_disgust_mean>${stats['results']['<40_disgust_mean'] | x}<less_40_disgust_mean>
-        <less_40_fear_mean>${stats['results']['<40_fear_mean'] | x}<less_40_fear_mean>
-        <less_40_joy_mean>${stats['results']['<40_joy_mean'] | x}<less_40_joy_mean>
-        <less_40_sadness_mean>${stats['results']['<40_sadness_mean'] | x}<less_40_sadness_mean>
-        <less_40_surprise_mean>${stats['results']['<40_surprise_mean'] | x}<less_40_surprise_mean>
-        <less_40_trust_mean>${stats['results']['<40_trust_mean'] | x}<less_40_trust_mean>
-        <grt_or_eq_40_positive_mean>${stats['results']['>=40_positive_mean'] | x}<grt_or_eq_40_positive_mean>
-        <grt_or_eq_40_negative_mean>${stats['results']['>=40_negative_mean'] | x}<grt_or_eq_40_negative_mean>
-        <grt_or_eq_40_anger_mean>${stats['results']['>=40_anger_mean'] | x}<grt_or_eq_40_anger_mean>
-        <grt_or_eq_40_anticipation_mean>${stats['results']['>=40_anticipation_mean'] | x}<grt_or_eq_40_anticipation_mean>
-        <grt_or_eq_40_disgust_mean>${stats['results']['>=40_disgust_mean'] | x}<grt_or_eq_40_disgust_mean>
-        <grt_or_eq_40_fear_mean>${stats['results']['>=40_fear_mean'] | x}<grt_or_eq_40_fear_mean>
-        <grt_or_eq_40_joy_mean>${stats['results']['>=40_joy_mean'] | x}<grt_or_eq_40_joy_mean>
-        <grt_or_eq_40_sadness_mean>${stats['results']['>=40_sadness_mean'] | x}<grt_or_eq_40_sadness_mean>
-        <grt_or_eq_40_surprise_mean>${stats['results']['>=40_surprise_mean'] | x}<grt_or_eq_40_surprise_mean>
-        <grt_or_eq_40_trust_mean>${stats['results']['>=40_trust_mean'] | x}<grt_or_eq_40_trust_mean>
-        <less_40_positive_stdv>${stats['results']['<40_positive_stdv'] | x}<less_40_positive_stdv>
-        <less_40_negative_stdv>${stats['results']['<40_negative_stdv'] | x}<less_40_negative_stdv>
-        <less_40_anger_stdv>${stats['results']['<40_anger_stdv'] | x}<less_40_anger_stdv>
-        <less_40_anticipation_stdv>${stats['results']['<40_anticipation_stdv'] | x}<less_40_anticipation_stdv>
-        <less_40_disgust_stdv>${stats['results']['<40_disgust_stdv'] | x}<less_40_disgust_stdv>
-        <less_40_fear_stdv>${stats['results']['<40_fear_stdv'] | x}<less_40_fear_stdv>
-        <less_40_joy_stdv>${stats['results']['<40_joy_stdv'] | x}<less_40_joy_stdv>
-        <less_40_sadness_stdv>${stats['results']['<40_sadness_stdv'] | x}<less_40_sadness_stdv>
-        <less_40_surprise_stdv>${stats['results']['<40_surprise_stdv'] | x}<less_40_surprise_stdv>
-        <less_40_trust_stdv>${stats['results']['<40_trust_stdv'] | x}<less_40_trust_stdv>
-        <grt_or_eq_40_positive_stdv>${stats['results']['>=40_positive_stdv'] | x}<grt_or_eq_40_positive_stdv>
-        <grt_or_eq_40_negative_stdv>${stats['results']['>=40_negative_stdv'] | x}<grt_or_eq_40_negative_stdv>
-        <grt_or_eq_40_anger_stdv>${stats['results']['>=40_anger_stdv'] | x}<grt_or_eq_40_anger_stdv>
-        <grt_or_eq_40_anticipation_stdv>${stats['results']['>=40_anticipation_stdv'] | x}<grt_or_eq_40_anticipation_stdv>
-        <grt_or_eq_40_disgust_stdv>${stats['results']['>=40_disgust_stdv'] | x}<grt_or_eq_40_disgust_stdv>
-        <grt_or_eq_40_fear_stdv>${stats['results']['>=40_fear_stdv'] | x}<grt_or_eq_40_fear_stdv>
-        <grt_or_eq_40_joy_stdv>${stats['results']['>=40_joy_stdv'] | x}<grt_or_eq_40_joy_stdv>
-        <grt_or_eq_40_sadness_stdv>${stats['results']['>=40_sadness_stdv'] | x}<grt_or_eq_40_sadness_stdv>
-        <grt_or_eq_40_surprise_stdv>${stats['results']['>=40_surprise_stdv'] | x}<grt_or_eq_40_surprise_stdv>
-        <grt_or_eq_40_trust_stdv>${stats['results']['>=40_trust_stdv'] | x}<grt_or_eq_40_trust_stdv>
-    <results>
+        <less_40_positive_mean>${stats['results']['<40_positive_mean'] | x}</less_40_positive_mean>
+        <less_40_negative_mean>${stats['results']['<40_negative_mean'] | x}</less_40_negative_mean>
+        <less_40_anger_mean>${stats['results']['<40_anger_mean'] | x}</less_40_anger_mean>
+        <less_40_anticipation_mean>${stats['results']['<40_anticipation_mean'] | x}</less_40_anticipation_mean>
+        <less_40_disgust_mean>${stats['results']['<40_disgust_mean'] | x}</less_40_disgust_mean>
+        <less_40_fear_mean>${stats['results']['<40_fear_mean'] | x}</less_40_fear_mean>
+        <less_40_joy_mean>${stats['results']['<40_joy_mean'] | x}</less_40_joy_mean>
+        <less_40_sadness_mean>${stats['results']['<40_sadness_mean'] | x}</less_40_sadness_mean>
+        <less_40_surprise_mean>${stats['results']['<40_surprise_mean'] | x}</less_40_surprise_mean>
+        <less_40_trust_mean>${stats['results']['<40_trust_mean'] | x}</less_40_trust_mean>
+        <grt_or_eq_40_positive_mean>${stats['results']['>=40_positive_mean'] | x}</grt_or_eq_40_positive_mean>
+        <grt_or_eq_40_negative_mean>${stats['results']['>=40_negative_mean'] | x}</grt_or_eq_40_negative_mean>
+        <grt_or_eq_40_anger_mean>${stats['results']['>=40_anger_mean'] | x}</grt_or_eq_40_anger_mean>
+        <grt_or_eq_40_anticipation_mean>${stats['results']['>=40_anticipation_mean'] | x}</grt_or_eq_40_anticipation_mean>
+        <grt_or_eq_40_disgust_mean>${stats['results']['>=40_disgust_mean'] | x}</grt_or_eq_40_disgust_mean>
+        <grt_or_eq_40_fear_mean>${stats['results']['>=40_fear_mean'] | x}</grt_or_eq_40_fear_mean>
+        <grt_or_eq_40_joy_mean>${stats['results']['>=40_joy_mean'] | x}</grt_or_eq_40_joy_mean>
+        <grt_or_eq_40_sadness_mean>${stats['results']['>=40_sadness_mean'] | x}</grt_or_eq_40_sadness_mean>
+        <grt_or_eq_40_surprise_mean>${stats['results']['>=40_surprise_mean'] | x}</grt_or_eq_40_surprise_mean>
+        <grt_or_eq_40_trust_mean>${stats['results']['>=40_trust_mean'] | x}</grt_or_eq_40_trust_mean>
+        <less_40_positive_stdv>${stats['results']['<40_positive_stdv'] | x}</less_40_positive_stdv>
+        <less_40_negative_stdv>${stats['results']['<40_negative_stdv'] | x}</less_40_negative_stdv>
+        <less_40_anger_stdv>${stats['results']['<40_anger_stdv'] | x}</less_40_anger_stdv>
+        <less_40_anticipation_stdv>${stats['results']['<40_anticipation_stdv'] | x}</less_40_anticipation_stdv>
+        <less_40_disgust_stdv>${stats['results']['<40_disgust_stdv'] | x}</less_40_disgust_stdv>
+        <less_40_fear_stdv>${stats['results']['<40_fear_stdv'] | x}</less_40_fear_stdv>
+        <less_40_joy_stdv>${stats['results']['<40_joy_stdv'] | x}</less_40_joy_stdv>
+        <less_40_sadness_stdv>${stats['results']['<40_sadness_stdv'] | x}</less_40_sadness_stdv>
+        <less_40_surprise_stdv>${stats['results']['<40_surprise_stdv'] | x}</less_40_surprise_stdv>
+        <less_40_trust_stdv>${stats['results']['<40_trust_stdv'] | x}</less_40_trust_stdv>
+        <grt_or_eq_40_positive_stdv>${stats['results']['>=40_positive_stdv'] | x}</grt_or_eq_40_positive_stdv>
+        <grt_or_eq_40_negative_stdv>${stats['results']['>=40_negative_stdv'] | x}</grt_or_eq_40_negative_stdv>
+        <grt_or_eq_40_anger_stdv>${stats['results']['>=40_anger_stdv'] | x}</grt_or_eq_40_anger_stdv>
+        <grt_or_eq_40_anticipation_stdv>${stats['results']['>=40_anticipation_stdv'] | x}</grt_or_eq_40_anticipation_stdv>
+        <grt_or_eq_40_disgust_stdv>${stats['results']['>=40_disgust_stdv'] | x}</grt_or_eq_40_disgust_stdv>
+        <grt_or_eq_40_fear_stdv>${stats['results']['>=40_fear_stdv'] | x}</grt_or_eq_40_fear_stdv>
+        <grt_or_eq_40_joy_stdv>${stats['results']['>=40_joy_stdv'] | x}</grt_or_eq_40_joy_stdv>
+        <grt_or_eq_40_sadness_stdv>${stats['results']['>=40_sadness_stdv'] | x}</grt_or_eq_40_sadness_stdv>
+        <grt_or_eq_40_surprise_stdv>${stats['results']['>=40_surprise_stdv'] | x}</grt_or_eq_40_surprise_stdv>
+        <grt_or_eq_40_trust_stdv>${stats['results']['>=40_trust_stdv'] | x}</grt_or_eq_40_trust_stdv>
+    </results>
 </stats>
 '''
 
