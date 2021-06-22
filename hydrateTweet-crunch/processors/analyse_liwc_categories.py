@@ -40,6 +40,17 @@ stats_template = '''
 </stats>
 '''
 
+stats_template_finalize = '''
+<stats>
+    <performance>
+        <start_time>${stats["performance"]["start_time"] | x}</start_time>
+        <end_time>${stats["performance"]["end_time"] | x}</end_time>
+        <input>
+            <lines>${stats["performance"]["input"]["lines"] | x}</lines>
+        </input>
+    </performance>
+    <results>
+'''
 
 # add others if needed
 liwc_dicts = {
@@ -47,6 +58,7 @@ liwc_dicts = {
     'en': 'hydrateTweet-crunch/assets/English_LIWC2015_Dictionary.dic',
     'es': 'hydrateTweet-crunch/assets/Spanish_LIWC2007_Dictionary.dic',
 }
+
 
 def process_lines(
         dump: Iterable[list],
@@ -404,17 +416,7 @@ def standardize(
         else:
             filter_fields = ['']
 
-        stats_template_finalize = '''
-<stats>
-    <performance>
-        <start_time>${stats["performance"]["start_time"] | x}</start_time>
-        <end_time>${stats["performance"]["end_time"] | x}</end_time>
-        <input>
-            <lines>${stats["performance"]["input"]["lines"] | x}</lines>
-        </input>
-    </performance>
-    <results>
-'''
+        stats_finalize = stats_template_finalize
         
         for field in filter_fields:
             for category in category_names:
@@ -426,12 +428,12 @@ def standardize(
                 else:
                     xml_tag = stats_name
 
-                stats_template_finalize = ''.join([
-                    stats_template_finalize,
+                stats_finalize = ''.join([
+                    stats_finalize,
                     '       <%s_mean>${stats["results"]["%s_mean"] | x}</%s_mean>\n' % (xml_tag, stats_name, xml_tag)
                 ])
-                stats_template_finalize = ''.join([
-                    stats_template_finalize,
+                stats_finalize = ''.join([
+                    stats_finalize,
                     '       <%s_stdv>${stats["results"]["%s_stdv"] | x}</%s_stdv>\n' % (xml_tag, stats_name, xml_tag)
                 ])
 
@@ -443,8 +445,8 @@ def standardize(
 
                 fieldnames.append(stats_name)
 
-        stats_template_finalize = ''.join([
-            stats_template_finalize,
+        stats_finalize = ''.join([
+            stats_finalize,
             '   </results>\n</stats>'
         ])
 
@@ -506,17 +508,13 @@ def standardize(
             for category in category_names:
                 mean = stats_dict[f"{category}_mean"]
                 stdv = stats_dict[f"{category}_stdv"]
-                print(f'{category}, mean {mean}, std {stdv}')
                 for field in filter_fields:
                     stats_name = '{}{}'.format(field, category)
                     stats_value = float(line[stats_name])
-                    print(f'value: {stats_value}')
                     try:
                         csv_row[stats_name] = (stats_value - mean) / stdv
-                        print(f'{(stats_value - mean)}, {(stats_value - mean) / stdv}')
                     except:
                         csv_row[stats_name] = 0
-                    print(f'result: {csv_row[stats_name]}')
             writer.writerow(csv_row)
 
         output.close()
@@ -525,7 +523,7 @@ def standardize(
         stats['performance']['end_time'] = datetime.datetime.utcnow()
         with stats_output:
             dumper.render_template(
-                stats_template_finalize,
+                stats_finalize,
                 stats_output,
                 stats=stats,
             )
