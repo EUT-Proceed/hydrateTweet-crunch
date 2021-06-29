@@ -11,5 +11,6 @@ from . import (
     geocode,
     map_users_to_location,
     analyse_locations_emotions,
-    analyse_liwc_categories
+    analyse_liwc_categories,
+    calc_liwc_words_frequency
 )
