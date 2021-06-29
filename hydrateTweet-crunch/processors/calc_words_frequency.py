@@ -42,6 +42,25 @@ stats_template = '''
 
 RELEVANT_EMOTIONS = ["positive", "negative", "anger", "anticipation", "disgust", "fear", "joy", "sadness", "surprise", "trust"]
 
+def get_valid_users(args: argparse.Namespace):
+    if os.path.exists(args.users_file):
+        try:
+            json_reader = fu.open_jsonobjects_file(args.users_file)
+            valid_users = set()
+            for user in json_reader:
+                valid_users.add(user["id_str"])
+            return valid_users
+        except:
+            try:
+                csv_reader = csv.DictReader(fu.open_csv_file(args.users_file))
+                valid_users = {}
+                for user in csv_reader:
+                    valid_users.add(user["id_str"])
+                return valid_users
+            except:
+                utils.log('The file is neither a .json nor a .csv')
+
+    return None
 
 def process_lines(
         dump: Iterable[list],
@@ -53,12 +72,21 @@ def process_lines(
     """
     first = next(dump)
     lang = first['lang']
+
+    if args.users_file:
+        utils.log('Specified a set of users to filter the tweet')
+        valid_users = get_valid_users(args)
+        if not valid_users:
+            utils.log('The file of valid users could not be found\n')
+            return None
+    
     if initEmotionLexicon(lang=lang):
 
         process_tweet(
             first,
             stats=stats,
             words_dict=words_dict,
+            valid_users=valid_users,
             args=args
         )
         for raw_obj in dump:
@@ -66,6 +94,7 @@ def process_lines(
                 raw_obj,
                 stats=stats,
                 words_dict=words_dict,
+                valid_users=valid_users,
                 args=args
             )
         return lang
@@ -77,11 +106,16 @@ def process_tweet(
     tweet: dict,
     stats: Mapping,
     words_dict: dict,
+    valid_users,
     args: argparse.Namespace):
     """Analyze the words in a tweet and save their occurrences w.r.t. their emotion
     """
 
     full_text = tweet['full_text']
+    user_id = str(tweet['user']['id'])
+
+    if args.users_file and not user_id in valid_users:
+        return
 
     for word in tokenize(full_text):
         emotions = getEmotionsOfWord(word)
@@ -137,6 +171,13 @@ def configure_subparsers(subparsers):
         required=False,
         default=30,
         help='The number of words per emotion that will be saved on the output file [default: 30].',
+    )
+    parser.add_argument(
+        '--users-file',
+        type=Path,
+        required=False,
+        default=None,
+        help='Optional file containing the users whose tweet will be considered in the process.',
     )
 
     parser.set_defaults(func=main, which='calc_words_frequency')
