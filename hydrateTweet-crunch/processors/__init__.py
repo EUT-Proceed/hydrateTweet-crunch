@@ -12,5 +12,6 @@ from . import (
     map_users_to_location,
     analyse_locations_emotions,
     analyse_liwc_categories,
-    calc_liwc_words_frequency
+    calc_liwc_words_frequency,
+    analyse_locations_categories
 )

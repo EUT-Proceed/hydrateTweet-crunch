@@ -59,6 +59,7 @@ def get_args():
     processors.analyse_locations_emotions.configure_subparsers(subparsers)
     processors.analyse_liwc_categories.configure_subparsers(subparsers)
     processors.calc_liwc_words_frequency.configure_subparsers(subparsers)
+    processors.analyse_locations_categories.configure_subparsers(subparsers)
 
     parsed_args = parser.parse_args()
     if 'func' not in parsed_args:

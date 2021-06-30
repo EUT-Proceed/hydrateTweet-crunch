@@ -98,7 +98,7 @@ def process_lines(
             valid_users = get_valid_users(args, lang)
             if not valid_users:
                 utils.log('The file of valid users could not be found')
-                return None
+                return (None, None)
 
         process_tweet(
             first,
@@ -123,7 +123,7 @@ def process_lines(
             )
         return (lang, category_names)
     else:
-        return None
+        return (None, None)
 
 
 def get_valid_users(args: argparse.Namespace,

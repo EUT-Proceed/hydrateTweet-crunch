@@ -73,6 +73,8 @@ def process_lines(
     first = next(dump)
     lang = first['lang']
 
+    valid_users=None
+
     if args.users_file:
         utils.log('Specified a set of users to filter the tweet')
         valid_users = get_valid_users(args)
