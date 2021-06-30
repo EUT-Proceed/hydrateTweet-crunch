@@ -153,11 +153,8 @@ def process_tweet(
 
     user_categories = users_dict[user_id]
     
-    print(full_text)
     for token in re.split(r'\s+|\.|,|\!|\?|:|;|\(|\)|#|-', full_text.lower()):
-        print(token)
         for liwc_category in parse(token):
-            print(f'\t{liwc_category}')
             if liwc_category in user_categories and user_categories[liwc_category] == 0:
                 stats_dict[f'{liwc_category}_count'] += 1
                 user_categories[liwc_category] = 1
