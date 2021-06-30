@@ -156,7 +156,7 @@ def process_tweet(
     for token in re.split(r'\s+|\.|,|\!|\?|:|;|\(|\)|#|-', full_text.lower()):
         for liwc_category in parse(token):
             if liwc_category in user_categories and user_categories[liwc_category] == 0:
-                stats_dict[f'{liwc_category}_count'] += 1
+                location_stats[f'{liwc_category}_count'] += 1
                 user_categories[liwc_category] = 1
     
     stats['performance']['input']['tweets'] += 1
