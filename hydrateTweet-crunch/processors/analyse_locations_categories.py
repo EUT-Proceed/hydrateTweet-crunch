@@ -244,7 +244,7 @@ def main(
 
         # calculate emotions
         calculate_liwc_categories(
-            stats_dict=stats_dict,
+            stats_dict=location_stats,
             category_names=category_names,
             args=args
         )
