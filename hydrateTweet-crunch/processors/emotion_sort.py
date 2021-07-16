@@ -247,8 +247,6 @@ def main(
             output_filename = f"{lang}-{path_list[0]}-{path_list[1]}-{date}.csv"
         
         for category, tweets in tweets_dict.items():
-            print(tweets)
-            print()
             if isinstance(tweets, dict):
                 full_path = f'{file_path}/{category}/{output_filename}'
                 Path(f'{file_path}/{category}').mkdir(parents=True, exist_ok=True)
