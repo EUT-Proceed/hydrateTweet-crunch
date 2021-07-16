@@ -13,5 +13,6 @@ from . import (
     analyse_locations_emotions,
     analyse_liwc_categories,
     calc_liwc_words_frequency,
-    analyse_locations_categories
+    analyse_locations_categories,
+    emotion_sort
 )
