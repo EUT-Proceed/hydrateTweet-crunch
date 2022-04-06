@@ -5,6 +5,8 @@ output/*
 !output/.gitkeep
 logs/*
 misc/*
+*.csv
+*.dic
 
 # ignore pyenv version
 .python-version

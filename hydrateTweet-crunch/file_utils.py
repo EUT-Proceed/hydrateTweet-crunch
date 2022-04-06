@@ -40,16 +40,16 @@ def compressor_7z(file_path: str):
     return io.TextIOWrapper(p.stdin, encoding='utf-8')
 
 
-def output_writer(path: str, compression: Optional[str]):
+def output_writer(path: str, compression: Optional[str], mode: Optional[str]='at'):
     """Write data to a compressed file."""
     if compression == '7z':
         return compressor_7z(path + '.7z')
     elif compression == 'bz2':
-        return bz2.open(path + '.bz2', 'wt', encoding='utf-8')
-    elif compression == 'gzip':
-        return gzip.open(path + '.gz', 'wt', encoding='utf-8')
+        return bz2.open(path + '.bz2', mode, encoding='utf-8')
+    elif compression == 'gz':
+        return gzip.open(path + '.gz', mode, encoding='utf-8')
     else:
-        return open(path, 'wt', encoding='utf-8')
+        return open(path, mode, encoding='utf-8')
 
 
 def create_path(path: Union[pathlib.Path, str]):
